@@ -1,0 +1,58 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "shikumi"
+version = "0.1.0"
+description = "Interpret Python runtime objects as structured semantic views."
+keywords = [
+  "semantic-modeling",
+  "declarative",
+  "runtime-introspection",
+  "structured-data",
+  "llm",
+]
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "minoru_jp" }]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+]
+
+[project.scripts]
+shikumi = "shikumi.cli:main"
+
+[dependency-groups]
+docs = ["shikumi-devdoc==0.1.0"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+pythonpath = ["src", ".", "examples"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/shikumi"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"README.md" = "shikumi/_docs/README.md"
+"CHANGELOG.md" = "shikumi/_docs/CHANGELOG.md"
+"docs" = "shikumi/_docs"
+"examples" = "shikumi/_examples"
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "/src/shikumi",
+  "/examples",
+  "/docs",
+  "/README.md",
+  "/CHANGELOG.md",
+  "/LICENSE",
+  "/pyproject.toml",
+]
