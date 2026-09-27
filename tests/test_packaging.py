@@ -29,17 +29,12 @@ def test_wheel_embeds_public_documentation_but_not_repository_internals() -> Non
     }
 
 
-def test_sdist_contains_public_sources_and_excludes_internal_development_trees() -> None:
+def test_sdist_is_complete_release_source_with_narrow_repository_exclusions() -> None:
     data = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
-    include = set(data["tool"]["hatch"]["build"]["targets"]["sdist"]["include"])
+    sdist = data["tool"]["hatch"]["build"]["targets"]["sdist"]
 
-    assert "/src/shikumi" in include
-    assert "/examples" in include
-    assert "/docs" in include
-    assert "/CHANGELOG.md" in include
-    assert "/STATUS.md" in include
-    assert "/_internal" not in include
-    assert "/tests" not in include
+    assert "include" not in sdist
+    assert set(sdist["exclude"]) == {"/.github"}
 
 
 def test_examples_are_reference_sources_not_a_public_top_level_package() -> None:
@@ -48,11 +43,11 @@ def test_examples_are_reference_sources_not_a_public_top_level_package() -> None
     assert not list(Path("examples").glob("*/__main__.py"))
 
 
-def test_0_2_0_marks_the_beta_transition() -> None:
+def test_0_2_1_keeps_the_beta_release_contract() -> None:
     data = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
     project = data["project"]
 
-    assert project["version"] == "0.2.0"
+    assert project["version"] == "0.2.1"
     assert "Development Status :: 4 - Beta" in project["classifiers"]
     assert "Programming Language :: Python :: 3.14" in project["classifiers"]
     assert "Development Status :: 3 - Alpha" not in project["classifiers"]

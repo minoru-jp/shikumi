@@ -36,6 +36,20 @@ Shikumi の公開リリースごとの主な変更を記録する。
 
 次の公開リリースへ向けた変更。
 
+## V0_2_1
+
+配布物の役割を整理し、sdist を完全な release source として再構成。
+
+version: 0.2.1
+
+released on: 2026-09-27
+
+Changed:
+
+- wheel は実装、公開文書、公式作例を含む利用者向け distribution とする方針を維持した。
+- sdist を release の再構成・検証・理解に必要な完全な source distribution とし、`src/`、公開文書、`examples/` に加えて `tests/`、`devdocs/`、`scripts/` を含めるよう変更した。
+- sdist の対象を個別列挙する方式をやめ、project を原則収録し、`.github/` などの repository operation 設定、VCS metadata、仮想環境、cache、build output など release source ではないものだけを除外する方針へ変更した。
+
 ## V0_2_0
 
 文書体系の再構成、構造規定の再利用・論理要素、Beta移行。

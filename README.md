@@ -22,7 +22,7 @@ These application-specific semantics are not built into Shikumi. They are define
 pip install shikumi
 ```
 
-Current version: `0.2.0`. Shikumi requires Python `>=3.11`. Development status is Beta from 0.2.0.
+Current version: `0.2.1`. Shikumi requires Python `>=3.11`. Development status is Beta from 0.2.0.
 
 ## Minimal example
 

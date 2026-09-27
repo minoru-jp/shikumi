@@ -28,28 +28,46 @@ REQUIRED_WHEEL_SUFFIXES = {
 }
 
 
-FORBIDDEN_PARTS = {"_internal", "tests", "__pycache__", "shikumi_examples", "devdocs"}
-REPOSITORY_ONLY_SUFFIXES: set[str] = set()
+WHEEL_FORBIDDEN_PARTS = {
+    "_internal",
+    "tests",
+    "__pycache__",
+    "shikumi_examples",
+    "devdocs",
+    "scripts",
+}
+SDIST_FORBIDDEN_PARTS = {
+    ".git",
+    ".github",
+    ".jj",
+    ".venv",
+    "venv",
+    "env",
+    "__pycache__",
+    ".pytest_cache",
+    ".mypy_cache",
+    ".pyright",
+    ".ruff_cache",
+    "build",
+    "dist",
+}
 
 
-def _assert_clean(names: list[str], *, archive: Path) -> None:
-    bad = [name for name in names if FORBIDDEN_PARTS.intersection(Path(name).parts)]
+def _assert_no_forbidden_parts(
+    names: list[str], *, archive: Path, forbidden_parts: set[str]
+) -> None:
+    bad = [name for name in names if forbidden_parts.intersection(Path(name).parts)]
     if bad:
         raise SystemExit(f"{archive.name}: forbidden paths found: {bad[:10]}")
-
-
-def _assert_repository_only_absent(names: list[str], *, archive: Path) -> None:
-    bad = [name for name in names if any(name.endswith(suffix) for suffix in REPOSITORY_ONLY_SUFFIXES)]
-    if bad:
-        raise SystemExit(f"{archive.name}: repository-only documents found: {bad[:10]}")
 
 
 def check_wheel(path: Path) -> None:
     with zipfile.ZipFile(path) as zf:
         names = zf.namelist()
 
-    _assert_clean(names, archive=path)
-    _assert_repository_only_absent(names, archive=path)
+    _assert_no_forbidden_parts(
+        names, archive=path, forbidden_parts=WHEEL_FORBIDDEN_PARTS
+    )
     missing = [suffix for suffix in REQUIRED_WHEEL_SUFFIXES if not any(name.endswith(suffix) for name in names)]
     if missing:
         raise SystemExit(f"{path.name}: required wheel files missing: {missing}")
@@ -59,8 +77,9 @@ def check_sdist(path: Path) -> None:
     with tarfile.open(path, "r:gz") as tf:
         names = tf.getnames()
 
-    _assert_clean(names, archive=path)
-    _assert_repository_only_absent(names, archive=path)
+    _assert_no_forbidden_parts(
+        names, archive=path, forbidden_parts=SDIST_FORBIDDEN_PARTS
+    )
     required_suffixes = {
         "README.md",
         "CHANGELOG.md",
@@ -81,6 +100,15 @@ def check_sdist(path: Path) -> None:
         "examples/structure_showcase/valid/combined/required/__init__.py",
         "examples/structure_showcase/invalid/group_both/mode/remote/__init__.py",
         "src/shikumi/__init__.py",
+        "tests/test_packaging.py",
+        "tests/test_devdocs.py",
+        "devdocs/README.md",
+        "devdocs/canonical_sources/changelog.py",
+        "devdocs/canonical_sources/devdocs/readme.py",
+        "devdocs/canonical_documents/CHANGELOG.md",
+        "devdocs/config/notice.toml",
+        "scripts/check_dist.py",
+        "scripts/render_canonical_docs.py",
     }
     missing = [suffix for suffix in required_suffixes if not any(name.endswith(suffix) for name in names)]
     if missing:

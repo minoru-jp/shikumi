@@ -121,9 +121,11 @@ translation-source metadata で `preserve_spelling` 対象となった用語は�
 
 ## 配置と配布
 
-README、公開リファレンス、公式作例の README、CHANGELOG などは distribution に含められる。一方、`devdocs/` はリポジトリ保守用であり、`devdocs/README.md` を含めて Shikumi の wheel / sdist には含めない。
+wheel は Shikumi を利用するための distribution とし、実装、公開文書、公式作例を含める。`tests/`、`devdocs/`、`scripts/` など、release の開発・検証に使う repository source は wheel へ含めない。
 
-canonical source と canonical document は公開 Python API ではない。
+sdist はその release を再構成・検証・理解できる完全な release source とする。`src/`、公開文書、`examples/` に加えて、`tests/`、`devdocs/`、`scripts/`、project metadata を含める。`.github/` などの repository operation 設定、VCS metadata、仮想環境、cache、build output など release source ではないものは含めない。
+
+`devdocs/` の canonical source と canonical document は sdist に含まれるが、公開 Python API ではない。
 
 ## 確認
 

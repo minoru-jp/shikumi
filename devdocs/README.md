@@ -107,9 +107,11 @@ If translation exposes ambiguity or missing specification, fix the canonical sou
 
 ## Placement and distribution
 
-README, public references, official example READMEs, and CHANGELOG may be included in the distribution. `devdocs/` is a repository-maintenance workspace. `devdocs/README.md` and the rest of this directory are not included in the Shikumi wheel or sdist.
+The wheel is the distribution for using Shikumi and contains the implementation, public documentation, and official examples. Repository sources used to develop or verify a release, such as `tests/`, `devdocs/`, and `scripts/`, are not included in the wheel.
 
-Canonical sources and canonical documents are not public Python API.
+The sdist is the complete release source from which that release can be reconstructed, verified, and understood. In addition to `src/`, public documentation, and `examples/`, it includes `tests/`, `devdocs/`, `scripts/`, and project metadata. Repository-operation settings such as `.github/`, VCS metadata, virtual environments, caches, build outputs, and other material that is not release source are excluded.
+
+The canonical sources and canonical documents under `devdocs/` are included in the sdist, but they are not public Python API.
 
 ## Verification
 

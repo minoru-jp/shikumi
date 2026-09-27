@@ -6,6 +6,16 @@ Records the major changes in each public release of Shikumi.
 
 Changes planned for the next public release.
 
+## 0.2.1 - 2026-09-27
+
+Reorganized distribution roles and rebuilt the sdist as a complete release source.
+
+### Changed
+
+- Kept the wheel as the user-facing distribution containing the implementation, public documentation, and official examples.
+- Changed the sdist into a complete source distribution for reconstructing, verifying, and understanding the release. In addition to `src/`, public documentation, and `examples/`, it now includes `tests/`, `devdocs/`, and `scripts/`.
+- Replaced the sdist's explicit inclusion list with an include-by-default policy. Repository-operation settings such as `.github/`, VCS metadata, virtual environments, caches, build outputs, and other material that is not release source remain excluded.
+
 ## 0.2.0 - 2026-09-27
 
 Documentation-system restructuring, reusable/logical structure regulations, and the transition to Beta.

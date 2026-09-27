@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "shikumi"
-version = "0.2.0"
+version = "0.2.1"
 description = "Interpret Python runtime objects as structured semantic views."
 keywords = [
   "semantic-modeling",
@@ -49,13 +49,10 @@ packages = ["src/shikumi"]
 "examples" = "shikumi/_examples"
 
 [tool.hatch.build.targets.sdist]
-include = [
-  "/src/shikumi",
-  "/examples",
-  "/docs",
-  "/README.md",
-  "/CHANGELOG.md",
-  "/STATUS.md",
-  "/LICENSE",
-  "/pyproject.toml",
+# An sdist is the complete release source. Hatchling includes the project by
+# default (while respecting VCS ignore rules); exclude only repository-operation
+# files that are not part of the release itself. Hatchling always keeps the
+# root .gitignore in an sdist, while the paths ignored by it remain omitted.
+exclude = [
+  "/.github",
 ]
