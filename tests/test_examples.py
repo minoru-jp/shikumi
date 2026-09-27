@@ -1,44 +1,59 @@
 from __future__ import annotations
 
-from architecture import body as architecture_body
-from architecture.shikumi_lib.norms import architecture
-from structured_docs import body as docs_body
-from structured_docs.shikumi_lib.norms import structured_docs
-from structured_docs.shikumi_lib.realizers.markdown import markdown as docs_markdown
-from structure_from_body import candidate, reference
-from structure_from_body.reference import catalog as reference_catalog
-from structure_from_body.candidate import catalog as candidate_catalog
-from structure_from_body.shikumi_lib.norms import structure_only
-from web_api import api
-from web_api.shikumi_lib.norms import web_api, web_api_structure
-from web_api.shikumi_lib.realizers.markdown import markdown as api_markdown
+from structure_showcase.invalid import (
+    bad_named,
+    closed_ordinary,
+    empty_collection,
+    group_both,
+    missing_required,
+)
+from structure_showcase.specification import showcase, showcase_structure
+from structure_showcase.valid import combined, minimal
 
 
-def test_architecture_example_validates_dependency_direction() -> None:
-    result = architecture.validate(architecture_body)
-    assert result.is_valid, result.diagnostics
+def _validate(package):
+    return showcase.validate(
+        package,
+        placement=(),
+        structure_specification=showcase_structure,
+    )
 
 
-def test_structured_docs_example_realizes_markdown() -> None:
-    result = structured_docs.validate(docs_body)
-    assert result.is_valid, result.diagnostics
-    assert docs_markdown.check(result.view).is_realizable
-    artifact = docs_markdown.realize(result.view)
-    assert "# Command catalog" in artifact
-    assert "## `deploy`" in artifact
-    assert "## `status`" in artifact
+def test_structure_showcase_accepts_minimal_and_combined_fixtures() -> None:
+    for package in (minimal, combined):
+        result = _validate(package)
+        assert result.is_valid, (package.__name__, result.diagnostics)
 
 
-def test_web_api_example_validates_and_realizes() -> None:
-    result = web_api.validate(api, structure_specification=web_api_structure)
-    assert result.is_valid, result.diagnostics
-    assert api_markdown.check(result.view).is_realizable
-    assert "### GET `/users/{user_id}`" in api_markdown.realize(result.view)
+def test_structure_showcase_combined_fixture_exercises_logical_bindings() -> None:
+    result = _validate(combined)
+    assert result.structure_check is not None
+
+    bindings = {
+        (binding.logical_element.logical_name, binding.actual_path)
+        for binding in result.structure_check.bindings
+    }
+    assert ("entry", ("collection", "alpha")) in bindings
+    assert ("variant", ("named", "alpha")) in bindings
+    assert ("package_child", ("mixed", "package_child")) in bindings
+    assert ("module_child", ("mixed", "module_child")) in bindings
+    assert ("branch", ("tree", "branch")) in bindings
+    assert ("branch", ("tree", "branch", "nested")) in bindings
+    assert ("module_leaf", ("tree", "branch", "nested", "leaf")) in bindings
+    assert ("ordinary", ("override", "ordinary")) in bindings
+    assert not any(path == ("override", "special") for _, path in bindings)
 
 
-def test_structure_from_body_checks_structure_not_content() -> None:
-    specification = structure_only.derive_structure_specification(reference)
-    result = structure_only.validate(candidate, structure_specification=specification)
+def test_structure_showcase_invalid_fixtures_have_stable_diagnostics() -> None:
+    cases = (
+        (missing_required, {"structure.element.missing"}),
+        (empty_collection, {"structure.logical.minimum"}),
+        (bad_named, {"structure.logical.minimum", "structure.element.unexpected"}),
+        (group_both, {"structure.group.maximum"}),
+        (closed_ordinary, {"structure.element.unexpected"}),
+    )
 
-    assert result.is_valid, result.diagnostics
-    assert reference_catalog.ITEM_1.__doc__ != candidate_catalog.ITEM_1.__doc__
+    for package, expected_codes in cases:
+        result = _validate(package)
+        assert not result.is_valid, package.__name__
+        assert {diagnostic.code for diagnostic in result.diagnostics} == expected_codes

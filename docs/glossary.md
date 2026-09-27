@@ -191,3 +191,21 @@ An Artifact may take the form of Markdown, HTML, JSON, a graph, a string, anothe
 The principle that Shikumi's semantic state is determined from the state established after Python execution.
 
 Python objects, Information, and Descriptor Uses produced as results of executing descriptors, decorators, `@=`, function calls, `import`, and other runtime behavior are the inputs to Interpretation.
+
+## Logical Structure Element
+
+A structural element in a Structure Specification that applies one regulation to multiple concrete elements that share the same structural role without fixing each concrete name in advance.
+
+A Logical Structure Element has a logical name, parent position, Structure Fragment, and optional allowed-name and cardinality constraints. It does not dispatch among different regulations through wildcards, prefixes, regular expressions, or similar name-pattern mechanisms. At one parent, at most one Logical Structure Element may regulate each `StructuralKind`; logical elements for different kinds may coexist. Concrete elements resolved under the same parent and kind follow the same regulation.
+
+## Structure Fragment
+
+A self-contained root-relative partial structural regulation that can be reused as part of a Structure Specification.
+
+A Structure Fragment can be mounted at concrete structural positions and can also serve as the regulation applied to each concrete instance of a Logical Structure Element. The same fragment may be lazily reapplied to recursive children to regulate structures of arbitrary observed depth. A normal Structure Fragment is closed and does not allow undescribed descendants. When descendant topology should be unrestricted, the fragment must explicitly be unconstrained.
+
+## Structure Group
+
+A regulation that treats several exact structural elements directly below the same parent as one set and constrains the minimum and maximum number of those members that may be present.
+
+A Structure Group does not choose or replace the regulation applied to each member. Every member retains its own `StructuralKind`, required/optional status, and Structure Fragment; the group constrains only aggregate cardinality across that set.

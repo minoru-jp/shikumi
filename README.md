@@ -1,28 +1,20 @@
 # Shikumi
 
-Shikumi is a **library for building structured document generators, custom DSLs, architecture validators, and similar systems on top of Python**.
+Shikumi is a library for **building Python systems with application-defined meaning, structure, and rules**.
 
-Shikumi itself does not provide those features as individual built-ins.
+It does not directly provide a structured-document generator, a domain-specific language, or an architecture validator. Instead, it provides the common foundation for composing those systems from Information Types, Descriptors, Structure, Validators, and Realizers defined by the application.
 
-Instead, you define a specification that determines what elements exist, what attributes and relationships they have, what structure they belong to, what counts as a valid state, and what can be produced from the resulting semantic view.
+Shikumi interprets Python objects after execution and constructs a Semantic View. The same Semantic View can be used for both Validation and Realization.
 
-For example, transforming the resulting semantic view into Markdown becomes document generation. Defining custom information types and description mechanisms such as `service`, `entity`, and `uses` creates a DSL. A rule such as "only dependencies from the application layer to the domain layer are allowed" becomes architecture validation.
+## Typical uses
 
-In other words, Shikumi does not deal with architecture, DSLs, or documents themselves. It is a **common foundation for building systems with custom meaning and rules on top of Python, interpreting them, and using the result**.
+- Generate artifacts such as Markdown, configuration, or reports from descriptions written in Python.
+- Build Python-based DSLs with application-specific attributes, classifications, and relationships.
+- Define and validate package, module, class, or dependency structures.
+- Apply the same regulation to multiple Python packages.
+- Use machine-readable descriptions with explicit meaning and structure in LLM-assisted workflows.
 
-## Main uses
-
-Shikumi can be used, for example, to:
-
-- generate documents, configuration, reports, and other artifacts from semantic views constructed from descriptions in Python code;
-- create documents with explicit meaning and structure for rapid communication with LLMs;
-- describe domain-specific attributes, classifications, and relationships on Python classes and modules;
-- build a Python-based DSL with custom descriptors and information types;
-- define the package, module, and class structure a project is expected to have;
-- apply the same specification to multiple Python packages; and
-- express software architecture structure and dependency directions, then build validation around them.
-
-These uses are not built into Shikumi itself. They are created by defining a specification for the intended purpose.
+These application-specific semantics are not built into Shikumi. They are defined by the user as a regulation for the intended use case.
 
 ## Installation
 
@@ -30,13 +22,11 @@ These uses are not built into Shikumi itself. They are created by defining a spe
 pip install shikumi
 ```
 
-Current version: `0.1.0`.
+Current version: `0.2.0`. Shikumi requires Python `>=3.11`. Development status is Beta from 0.2.0.
 
-Shikumi targets Python 3.11 and later.
+## Minimal example
 
-## Quick start
-
-The following example defines an information type named `title` and describes it through two kinds of descriptors: `@=` and a decorator.
+This example defines a `title` Information Type, describes the same semantic information through both `@=` and a decorator, and applies a Validator requiring entities to have a title.
 
 ```python
 from shikumi import (
@@ -51,7 +41,6 @@ from shikumi import (
 from shikumi.standard import assignment, decorator, information_type_rule
 
 Title = InformationType("title", str)
-
 title = assignment(Title)
 titled = decorator(Title)
 
@@ -87,111 +76,34 @@ assert docs.view(Overview).focused.values(Title) == ("Overview",)
 assert docs.validate(Overview).is_valid
 ```
 
-`InformationType` defines **what something means**; descriptors define **how that meaning is written in Python**. `Shikumi` combines the information types, validation rules, descriptor-use rules, and other parts it recognizes, constructs a semantic view with `view()`, and validates it with `validate()`.
+`InformationType` defines what a value means. Descriptors define how that meaning is written in Python. `view()` constructs a Semantic View, while `validate()` applies Validators to that view.
 
-`title @= "Overview"` is not ordinary attribute assignment. The descriptor created by `assignment(Title)` attaches information to `Overview` after the class has been created. `@=` is a Standard notation for describing meaning defined by the specification while keeping a natural class-body form.
+For an end-to-end example that continues through Realization, see [Getting Started](./docs/guides/getting-started.md).
 
-## Warning
+## Runtime model and safety
 
-**Only pass trusted Python modules and packages to Shikumi.**
+Shikumi is not a static analyzer that reconstructs meaning from Python source or ASTs. When a module or package is used as input, it is imported as ordinary Python code. Shikumi then interprets the runtime objects, Information, and Descriptor Uses that exist after execution.
 
-Shikumi interprets objects that exist after Python execution. When a module or package is supplied by import path, it is imported and executed as ordinary Python before Shikumi constructs its semantic view. This is true whether that semantic view is used for validation, realization, or another operation. Target code can perform arbitrary actions with the same permissions as a normal import in the current Python process.
+**Only give Shikumi modules and packages that contain trusted Python code.** Import-time code executes with the normal privileges of the current process even when the purpose is Validation.
 
-Be especially careful with validation: it is not a sandboxed or static safety check. Do not pass untrusted Python code to Shikumi in order to determine whether it is safe.
+The exact contracts for runtime determination, Structure, Validation, and Realization are documented in the [Specification](./docs/specification/INDEX.md).
 
-## Runtime determination principle
+## Official example
 
-Shikumi does not re-read Python source as an AST. Modules and packages used as description bodies are imported as ordinary Python, and Shikumi observes the runtime objects, information, and descriptor uses that exist after execution.
+[`structure_showcase`](./examples/structure_showcase/README.md) is an executable, domain-light showcase of general structural patterns expressible with `StructureSpecification`.
 
-```text
-Python source
-    ↓ execute / import
-runtime objects + information + descriptor uses
-    ↓
-Shikumi
-    ↓ interpretation
-semantic view
-   /          \
-validation     realization
-                  ↓
-               artifact
-```
+Single-feature usage belongs in the verified code examples in the Guides and API Reference. The `examples/` directory is reserved for a composed structural showcase with valid and invalid fixtures.
 
-Therefore, when a target module is loaded for validation, its top-level code is executed just as it is during a normal import. Shikumi is not a static analyzer that determines safety without executing the target.
+## Documentation
 
-## What Shikumi does not inspect automatically
+- [Guides](./docs/guides/INDEX.md): getting started, Descriptor authoring, project layout, and CLI wiring.
+- [Glossary](./docs/glossary.md): canonical definitions of Shikumi terminology.
+- [API Reference](./docs/api/INDEX.md): public Python API and CLI surface.
+- [Specification](./docs/specification/INDEX.md): semantic and compatibility contracts guaranteed by Shikumi.
+- [STATUS](./STATUS.md): current development stage, compatibility policy, path to 1.0, and known distribution limitations.
+- [CHANGELOG](./CHANGELOG.md): major changes by public release.
 
-Shikumi does not automatically analyze Python ASTs or source syntax, actual import or call graphs, or modules that have not been imported. The standard `PythonStructure` also does not treat functions or methods as entities. Model any additional information or targets explicitly in your norms or in a custom Structure.
-
-## Validation and realization
-
-Shikumi reads Python objects and the information attached to them according to a structure and constructs a semantic view.
-
-Validation applies validation rules to that semantic view. You can define conditions for a specific purpose, such as whether a package contains required modules, whether a class has required information, or whether relationships between elements satisfy a rule.
-
-A semantic view is not limited to validation. By applying an independent Realizer, it can be realized into arbitrary artifacts such as Markdown, configuration, or reports. Multiple Realizers can be applied to the same semantic view.
-
-## Standard
-
-`shikumi.standard` provides reusable concrete functionality built from Core mechanisms.
-
-Its main facilities include `assignment` for `@=`, `decorator` for decorator-based description, `docstring` for turning docstrings into information, and `PackageTreeStructure` for interpreting a package tree through ordinary imports.
-
-Purpose-specific meanings such as `service`, `entity`, `layer`, and `term` are not part of Standard. They are defined by the user's specification.
-
-## CLI
-
-The CLI can wire together a `Shikumi` exposed by a specification body, a description body, and an independent Realizer using ordinary Python imports.
-
-The CLI entry point is `shikumi`. The same CLI is also available through `python -m shikumi`.
-
-Validation:
-
-```bash
-shikumi validate \
-  --shikumi myproject.shikumi_lib.norms:app \
-  --body myproject.application \
-  --structure-spec myproject.shikumi_lib.norms:app_structure \
-  --format text
-```
-
-Realization:
-
-```bash
-shikumi realize \
-  --shikumi myproject.shikumi_lib.norms:app \
-  --body myproject.application \
-  --realizer myproject.shikumi_lib.realizers.markdown:markdown \
-  --output API.md \
-  --format json
-```
-
-`realize` does not implicitly perform validation or a realizability check. These are treated as independent operations.
-
-## Examples
-
-[`examples/`](./examples/) contains four official examples that approach Shikumi from different directions. They are bundled in the distribution as reference source, but they are not a public import package or CLI entry point.
-
-- [`architecture`](./examples/architecture/README.md) — define application-specific dependency rules and validate architecture
-- [`structured_docs`](./examples/structured_docs/README.md) — construct a semantic view from Python descriptions and realize it as Markdown
-- [`web_api`](./examples/web_api/README.md) — an end-to-end example combining a custom DSL, validation, and realization
-- [`structure_from_body`](./examples/structure_from_body/README.md) — derive a structural regulation from one description body and validate another body for structural conformance
-
-## Related documentation
-
-- [`docs/glossary.md`](./docs/glossary.md) — Shikumi terminology and semantic boundaries
-- [`docs/api-reference.md`](./docs/api-reference.md) — public API and its contracts
-- [`docs/distribution-guide.md`](./docs/distribution-guide.md) — placement and distribution of specification bodies, description bodies, and Realizers
-- [`CHANGELOG.md`](./CHANGELOG.md) — major changes by public release
-- [`examples/`](./examples/) — four official examples also bundled in the distribution as reference source
-
-For precise concept definitions, use the glossary as the reference.
-
-## About the public documentation
-
-All public documentation is provided in English. Canonical sources live under `_internal/document_source/`; `shikumi-devdoc` realizes committed Japanese intermediates under `_internal/document_build/ja/`, and those intermediates are used as the translation source for the public documents.
-
-Intermediate files are generated artifacts and are not edited directly. If a public document, an intermediate document, and a canonical source differ, the canonical document source takes precedence.
+Use the Glossary for concept meaning, the Specification for normative behavior, and the API Reference for name-oriented usage details.
 
 ## License
 

@@ -11,19 +11,25 @@ REQUIRED_WHEEL_SUFFIXES = {
     "shikumi/py.typed",
     "shikumi/_docs/README.md",
     "shikumi/_docs/CHANGELOG.md",
+    "shikumi/_docs/STATUS.md",
     "shikumi/_docs/glossary.md",
-    "shikumi/_docs/api-reference.md",
-    "shikumi/_docs/distribution-guide.md",
-    "shikumi/_examples/architecture/README.md",
-    "shikumi/_examples/architecture/body/__init__.py",
-    "shikumi/_examples/structured_docs/README.md",
-    "shikumi/_examples/web_api/README.md",
-    "shikumi/_examples/structure_from_body/README.md",
+    "shikumi/_docs/api/INDEX.md",
+    "shikumi/_docs/api/information.md",
+    "shikumi/_docs/specification/INDEX.md",
+    "shikumi/_docs/specification/core.md",
+    "shikumi/_docs/guides/INDEX.md",
+    "shikumi/_docs/guides/getting-started.md",
+    "shikumi/_docs/guides/descriptor-authoring.md",
+    "shikumi/_docs/guides/project-layout.md",
+    "shikumi/_examples/structure_showcase/README.md",
+    "shikumi/_examples/structure_showcase/specification.py",
+    "shikumi/_examples/structure_showcase/valid/combined/required/__init__.py",
+    "shikumi/_examples/structure_showcase/invalid/group_both/mode/remote/__init__.py",
 }
 
 
-FORBIDDEN_PARTS = {"_internal", "tests", "__pycache__", "shikumi_examples"}
-REPOSITORY_ONLY_SUFFIXES = {"DOCUMENTATION_WORKFLOW.md"}
+FORBIDDEN_PARTS = {"_internal", "tests", "__pycache__", "shikumi_examples", "devdocs"}
+REPOSITORY_ONLY_SUFFIXES: set[str] = set()
 
 
 def _assert_clean(names: list[str], *, archive: Path) -> None:
@@ -58,15 +64,22 @@ def check_sdist(path: Path) -> None:
     required_suffixes = {
         "README.md",
         "CHANGELOG.md",
+        "STATUS.md",
         "LICENSE",
         "pyproject.toml",
         "docs/glossary.md",
-        "docs/api-reference.md",
-        "docs/distribution-guide.md",
-        "examples/architecture/README.md",
-        "examples/structured_docs/README.md",
-        "examples/web_api/README.md",
-        "examples/structure_from_body/README.md",
+        "docs/api/INDEX.md",
+        "docs/api/information.md",
+        "docs/specification/INDEX.md",
+        "docs/specification/core.md",
+        "docs/guides/INDEX.md",
+        "docs/guides/getting-started.md",
+        "docs/guides/descriptor-authoring.md",
+        "docs/guides/project-layout.md",
+        "examples/structure_showcase/README.md",
+        "examples/structure_showcase/specification.py",
+        "examples/structure_showcase/valid/combined/required/__init__.py",
+        "examples/structure_showcase/invalid/group_both/mode/remote/__init__.py",
         "src/shikumi/__init__.py",
     }
     missing = [suffix for suffix in required_suffixes if not any(name.endswith(suffix) for name in names)]

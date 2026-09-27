@@ -1,1 +1,0 @@
-"""Structured-document realization example."""

@@ -23,6 +23,7 @@ def test_wheel_embeds_public_documentation_but_not_repository_internals() -> Non
     assert wheel["force-include"] == {
         "README.md": "shikumi/_docs/README.md",
         "CHANGELOG.md": "shikumi/_docs/CHANGELOG.md",
+        "STATUS.md": "shikumi/_docs/STATUS.md",
         "docs": "shikumi/_docs",
         "examples": "shikumi/_examples",
     }
@@ -36,6 +37,7 @@ def test_sdist_contains_public_sources_and_excludes_internal_development_trees()
     assert "/examples" in include
     assert "/docs" in include
     assert "/CHANGELOG.md" in include
+    assert "/STATUS.md" in include
     assert "/_internal" not in include
     assert "/tests" not in include
 
@@ -44,3 +46,13 @@ def test_examples_are_reference_sources_not_a_public_top_level_package() -> None
     assert Path("examples").is_dir()
     assert not Path("src/shikumi_examples").exists()
     assert not list(Path("examples").glob("*/__main__.py"))
+
+
+def test_0_2_0_marks_the_beta_transition() -> None:
+    data = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+    project = data["project"]
+
+    assert project["version"] == "0.2.0"
+    assert "Development Status :: 4 - Beta" in project["classifiers"]
+    assert "Programming Language :: Python :: 3.14" in project["classifiers"]
+    assert "Development Status :: 3 - Alpha" not in project["classifiers"]
