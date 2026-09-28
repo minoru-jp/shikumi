@@ -15,6 +15,17 @@ def test_distribution_metadata_uses_spdx_license_expression() -> None:
     assert project["license-files"] == ["LICENSE"]
 
 
+def test_project_urls_point_to_the_public_repository() -> None:
+    data = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+
+    assert data["project"]["urls"] == {
+        "Homepage": "https://github.com/minoru-jp/shikumi",
+        "Repository": "https://github.com/minoru-jp/shikumi",
+        "Documentation": "https://github.com/minoru-jp/shikumi/tree/main/docs",
+        "Issues": "https://github.com/minoru-jp/shikumi/issues",
+    }
+
+
 def test_wheel_embeds_public_documentation_but_not_repository_internals() -> None:
     data = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
     wheel = data["tool"]["hatch"]["build"]["targets"]["wheel"]

@@ -139,4 +139,4 @@ sdist はその release を再構成・検証・理解できる完全な release
 - published document のコード、リンク、公開名が壊れていない。
 - distribution 対象文書の配置が packaging test と一致する。
 
-現時点では hosted CI を設けていないため、これらの検査はローカルで実行する。GitHub へリポジトリを公開した時点で CI を構成し、canonical document の drift と文書上のコード例を自動検査する。
+GitHub Actions の hosted CI でもこれらの検査を実行する。`main` への push と pull request では Python 3.11 から 3.14 の test suite と canonical document の drift 検査を行い、別 job で wheel / sdist を build して distribution 内容も検査する。ローカル検証は引き続き変更を公開する前の基本手順とする。

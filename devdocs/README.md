@@ -125,4 +125,4 @@ For documentation changes, verify at least that:
 - published code examples, links, and public names remain valid; and
 - packaging tests match the intended placement of distributed documents.
 
-There is no hosted CI yet, so these checks are currently run locally. CI will be introduced when the repository is published on GitHub, including automated checks for canonical-document drift and documented code examples.
+GitHub Actions also runs these checks in hosted CI. Pushes and pull requests to `main` run the test suite on Python 3.11 through 3.14 and check canonical-document drift; a separate job builds the wheel and sdist and verifies their contents. Local verification remains the basic pre-publication workflow.

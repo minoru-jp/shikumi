@@ -34,12 +34,12 @@ After sufficient real-world use, Shikumi will move to `1.0.0` when there are no 
 
 The criterion for 1.0 is not an unlimited accumulation of features. The important condition is confidence that the current public API and conceptual model can continue to serve as a stable foundation for dependent projects.
 
-## Distribution note
+## Distribution and repository operations
 
-Shikumi is currently published **only through PyPI**. There is not yet a public web page for browsing the source repository.
+Shikumi is published through PyPI and the public GitHub repository `https://github.com/minoru-jp/shikumi`. PyPI is the distribution channel for the Python package, while GitHub is the public home for the source, published documentation, issues, and development history.
 
-As a result, some repository-relative links in the README and other published documentation do not resolve when the documentation is viewed on PyPI. This is a known limitation of the current distribution setup.
+Some repository-relative links in the README and other published documentation resolve on GitHub but may not resolve when the README is rendered on PyPI. The Repository and Documentation project URLs in package metadata provide the public repository entry points from PyPI.
 
-When the source repository is published on the web, for example on GitHub, the documentation links will be revised against the public repository URL so that they resolve correctly from the published documentation.
+Hosted CI runs on GitHub Actions for pushes and pull requests to `main`. It tests Python 3.11 through 3.14, checks canonical-document drift, builds the wheel and sdist, and verifies the distribution contents.
 
-There is also no hosted CI at present because there is no public source repository yet. Release verification and PyPI uploads are currently performed locally. CI will be introduced when the repository is published on GitHub and can be configured against that public environment.
+PyPI publication is separated from ordinary pushes. `.github/workflows/release.yml` runs only when a GitHub Release is published, verifies that the release tag matches the version in `pyproject.toml`, builds the distributions, and is configured to publish them with PyPI Trusted Publishing. Enabling Trusted Publishing requires the GitHub `pypi` environment and the corresponding Trusted Publisher registration on PyPI.
