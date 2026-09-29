@@ -54,10 +54,10 @@ class STATUS:
         """
         Shikumi は PyPI と公開 GitHub リポジトリ `https://github.com/minoru-jp/shikumi` で公開しています。PyPI は Python package の配布先、GitHub は source、公開文書、issue、開発履歴の公開先として扱います。
 
-        README やその他の公開文書に含まれる repository-relative な参照リンクの一部は、GitHub 上では解決できますが、PyPI の README 表示では解決できない場合があります。PyPI からは project metadata の Repository / Documentation URL を公開リポジトリへの入口として提供します。
+        トップレベル README の主要文書、公式作例、LICENSE への参照には公開 GitHub repository の絶対 URL を使用し、GitHub 上だけでなく PyPI の README 表示からも同じ公開文書へ辿れるようにしています。package metadata でも Homepage / Repository / Documentation / Issues URL を公開します。
 
         GitHub Actions の hosted CI は `main` への push と pull request で実行し、Python 3.11 から 3.14 のテスト、canonical document の drift 検査、wheel / sdist の build と distribution 内容検査を行います。
 
-        PyPI への公開は通常の push とは分離します。`.github/workflows/release.yml` は GitHub Release が publish された場合だけ動作し、release tag と `pyproject.toml` の version の一致を確認してから distribution を build し、PyPI Trusted Publishing で公開する構成です。Trusted Publishing を有効にするには、GitHub の `pypi` environment と PyPI 側の Trusted Publisher 登録を対応させる必要があります。
+        PyPI への公開は通常の push とは分離します。`.github/workflows/release.yml` は GitHub Release が publish された場合だけ動作し、release tag と `pyproject.toml` の version の一致を確認してから distribution を build し、PyPI Trusted Publishing で公開します。GitHub の `pypi` environment と PyPI 側の Trusted Publisher は対応付け済みです。
         """
         title @= "配布とリポジトリ運用"

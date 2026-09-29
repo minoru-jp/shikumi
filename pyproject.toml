@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "shikumi"
-version = "0.2.1"
+version = "0.2.2"
 description = "Interpret Python runtime objects as structured semantic views."
 keywords = [
   "semantic-modeling",

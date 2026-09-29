@@ -14,6 +14,14 @@ class CHANGELOG:
     class UNRELEASED:
         """次の公開リリースへ向けた変更。"""
 
+    class V0_2_2:
+        """PyPI から公開文書へ辿れるよう README と package metadata の公開リンクを整備。"""
+
+        version @= "0.2.2"
+        released_on @= "2026-09-29"
+        changed @= "README の Guides、Glossary、API Reference、Specification、STATUS、CHANGELOG、公式作例、LICENSE への参照を公開 GitHub repository の絶対 URL に変更し、PyPI の README 表示からも正しく辿れるようにした。"
+        changed @= "package metadata に Homepage、Repository、Documentation、Issues の project URL を追加し、PyPI から公開 repository と文書へ直接移動できるようにした。"
+
     class V0_2_1:
         """配布物の役割を整理し、sdist を完全な release source として再構成。"""
 

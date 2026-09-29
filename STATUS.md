@@ -38,8 +38,8 @@ The criterion for 1.0 is not an unlimited accumulation of features. The importan
 
 Shikumi is published through PyPI and the public GitHub repository `https://github.com/minoru-jp/shikumi`. PyPI is the distribution channel for the Python package, while GitHub is the public home for the source, published documentation, issues, and development history.
 
-Some repository-relative links in the README and other published documentation resolve on GitHub but may not resolve when the README is rendered on PyPI. The Repository and Documentation project URLs in package metadata provide the public repository entry points from PyPI.
+The top-level README uses absolute URLs in the public GitHub repository for its main documentation, official example, and LICENSE links, so the same published documents can be reached both from GitHub and when the README is rendered on PyPI. Package metadata also publishes Homepage, Repository, Documentation, and Issues URLs.
 
 Hosted CI runs on GitHub Actions for pushes and pull requests to `main`. It tests Python 3.11 through 3.14, checks canonical-document drift, builds the wheel and sdist, and verifies the distribution contents.
 
-PyPI publication is separated from ordinary pushes. `.github/workflows/release.yml` runs only when a GitHub Release is published, verifies that the release tag matches the version in `pyproject.toml`, builds the distributions, and is configured to publish them with PyPI Trusted Publishing. Enabling Trusted Publishing requires the GitHub `pypi` environment and the corresponding Trusted Publisher registration on PyPI.
+PyPI publication is separated from ordinary pushes. `.github/workflows/release.yml` runs only when a GitHub Release is published, verifies that the release tag matches the version in `pyproject.toml`, builds the distributions, and publishes them with PyPI Trusted Publishing. The GitHub `pypi` environment and the corresponding Trusted Publisher on PyPI are configured and linked.

@@ -6,6 +6,15 @@ Records the major changes in each public release of Shikumi.
 
 Changes planned for the next public release.
 
+## 0.2.2 - 2026-09-29
+
+Improved public links in the README and package metadata so documentation can be reached correctly from PyPI.
+
+### Changed
+
+- Changed README links for the Guides, Glossary, API Reference, Specification, STATUS, CHANGELOG, official example, and LICENSE to absolute URLs in the public GitHub repository so they also work when the README is rendered on PyPI.
+- Added Homepage, Repository, Documentation, and Issues project URLs to package metadata so PyPI links directly to the public repository and documentation.
+
 ## 0.2.1 - 2026-09-27
 
 Reorganized distribution roles and rebuilt the sdist as a complete release source.

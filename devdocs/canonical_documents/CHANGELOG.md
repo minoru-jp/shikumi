@@ -36,6 +36,19 @@ Shikumi の公開リリースごとの主な変更を記録する。
 
 次の公開リリースへ向けた変更。
 
+## V0_2_2
+
+PyPI から公開文書へ辿れるよう README と package metadata の公開リンクを整備。
+
+version: 0.2.2
+
+released on: 2026-09-29
+
+Changed:
+
+- README の Guides、Glossary、API Reference、Specification、STATUS、CHANGELOG、公式作例、LICENSE への参照を公開 GitHub repository の絶対 URL に変更し、PyPI の README 表示からも正しく辿れるようにした。
+- package metadata に Homepage、Repository、Documentation、Issues の project URL を追加し、PyPI から公開 repository と文書へ直接移動できるようにした。
+
 ## V0_2_1
 
 配布物の役割を整理し、sdist を完全な release source として再構成。

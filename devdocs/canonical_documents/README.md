@@ -52,7 +52,7 @@ ShikumiはPythonの実行後に成立した対象を解釈し、意味像を構�
 pip install shikumi
 ```
 
-現在のバージョンは `0.2.1` です。Python `>=3.11` を対象としています。0.2.0 から開発段階は Beta です。
+現在のバージョンは `0.2.2` です。Python `>=3.11` を対象としています。0.2.0 から開発段階は Beta です。
 
 ## 最小例
 
@@ -107,7 +107,7 @@ assert docs.validate(Overview).is_valid
 ```
 `InformationType`は「何を意味するか」を定義し、Python上で「どう書くか」は記述器が担います。`view()`は意味像を構成し、`validate()`はその意味像へ検証規則を適用します。
 
-続けて実現まで含む一連の流れを試す場合は [`Getting Started`](./docs/guides/getting-started.md) を参照してください。
+続けて実現まで含む一連の流れを試す場合は [`Getting Started`](https://github.com/minoru-jp/shikumi/blob/main/docs/guides/getting-started.md) を参照してください。
 
 ## 実行モデルと安全性
 
@@ -115,25 +115,25 @@ ShikumiはsourceをASTとして意味解析する静的解析器ではありま�
 
 したがって、**Shikumiへ渡すmoduleやpackageは信頼できるPythonコードだけにしてください。** 検証目的であってもimport時のコードは通常の権限で実行されます。
 
-実行時確定、構造、検証、実現の厳密な契約は [`Specification`](./docs/specification/INDEX.md) にまとめています。
+実行時確定、構造、検証、実現の厳密な契約は [`Specification`](https://github.com/minoru-jp/shikumi/blob/main/docs/specification/INDEX.md) にまとめています。
 
 ## 公式作例
 
-[`structure_showcase`](./examples/structure_showcase/README.md) は、特定用途の完成例ではなく、構造規定で表現できる一般的な構造パターンを valid / invalid fixture としてまとめた実行可能なショーケースです。
+[`structure_showcase`](https://github.com/minoru-jp/shikumi/blob/main/examples/structure_showcase/README.md) は、特定用途の完成例ではなく、構造規定で表現できる一般的な構造パターンを valid / invalid fixture としてまとめた実行可能なショーケースです。
 
 単一機能の使い方は Guides と API Reference の検証済みコード例へ置き、`examples/` は複数の構造プリミティブを組み合わせた完成形だけを扱います。
 
 ## 文書
 
-- [`Guides`](./docs/guides/INDEX.md): はじめ方、記述器の実装、project配置とCLI結線。
-- [`Glossary`](./docs/glossary.md): 用語の正規定義。
-- [`API Reference`](./docs/api/INDEX.md): 公開Python APIとCLI surface。
-- [`Specification`](./docs/specification/INDEX.md): Shikumiが保証する意味上・互換性上の契約。
-- [`STATUS`](./STATUS.md): 現在の開発段階、互換性方針、1.0への移行基準、配布上の既知制約。
-- [`CHANGELOG`](./CHANGELOG.md): 公開releaseごとの主な変更。
+- [`Guides`](https://github.com/minoru-jp/shikumi/blob/main/docs/guides/INDEX.md): はじめ方、記述器の実装、project配置とCLI結線。
+- [`Glossary`](https://github.com/minoru-jp/shikumi/blob/main/docs/glossary.md): 用語の正規定義。
+- [`API Reference`](https://github.com/minoru-jp/shikumi/blob/main/docs/api/INDEX.md): 公開Python APIとCLI surface。
+- [`Specification`](https://github.com/minoru-jp/shikumi/blob/main/docs/specification/INDEX.md): Shikumiが保証する意味上・互換性上の契約。
+- [`STATUS`](https://github.com/minoru-jp/shikumi/blob/main/STATUS.md): 現在の開発段階、互換性方針、1.0への移行基準、配布上の既知制約。
+- [`CHANGELOG`](https://github.com/minoru-jp/shikumi/blob/main/CHANGELOG.md): 公開releaseごとの主な変更。
 
 概念の意味はGlossary、規範的な挙動はSpecification、名前単位の利用方法はAPI Referenceを基準とします。
 
 ## License
 
-MIT License. See [`LICENSE`](./LICENSE).
+MIT License. See [`LICENSE`](https://github.com/minoru-jp/shikumi/blob/main/LICENSE).

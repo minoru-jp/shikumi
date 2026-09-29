@@ -54,11 +54,28 @@ def test_examples_are_reference_sources_not_a_public_top_level_package() -> None
     assert not list(Path("examples").glob("*/__main__.py"))
 
 
-def test_0_2_1_keeps_the_beta_release_contract() -> None:
+def test_0_2_2_keeps_the_beta_release_contract() -> None:
     data = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
     project = data["project"]
 
-    assert project["version"] == "0.2.1"
+    assert project["version"] == "0.2.2"
     assert "Development Status :: 4 - Beta" in project["classifiers"]
     assert "Programming Language :: Python :: 3.14" in project["classifiers"]
     assert "Development Status :: 3 - Alpha" not in project["classifiers"]
+
+
+def test_readme_navigation_is_safe_when_rendered_on_pypi() -> None:
+    import re
+
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    targets = re.findall(r"\[[^\]]*\]\(([^)]+)\)", readme)
+
+    assert targets
+    assert all(
+        target.startswith(("https://", "http://", "mailto:", "#"))
+        for target in targets
+    )
+    assert any(
+        target.startswith("https://github.com/minoru-jp/shikumi/")
+        for target in targets
+    )

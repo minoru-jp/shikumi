@@ -22,7 +22,7 @@ These application-specific semantics are not built into Shikumi. They are define
 pip install shikumi
 ```
 
-Current version: `0.2.1`. Shikumi requires Python `>=3.11`. Development status is Beta from 0.2.0.
+Current version: `0.2.2`. Shikumi requires Python `>=3.11`. Development status is Beta from 0.2.0.
 
 ## Minimal example
 
@@ -78,7 +78,7 @@ assert docs.validate(Overview).is_valid
 
 `InformationType` defines what a value means. Descriptors define how that meaning is written in Python. `view()` constructs a Semantic View, while `validate()` applies Validators to that view.
 
-For an end-to-end example that continues through Realization, see [Getting Started](./docs/guides/getting-started.md).
+For an end-to-end example that continues through Realization, see [Getting Started](https://github.com/minoru-jp/shikumi/blob/main/docs/guides/getting-started.md).
 
 ## Runtime model and safety
 
@@ -86,25 +86,25 @@ Shikumi is not a static analyzer that reconstructs meaning from Python source or
 
 **Only give Shikumi modules and packages that contain trusted Python code.** Import-time code executes with the normal privileges of the current process even when the purpose is Validation.
 
-The exact contracts for runtime determination, Structure, Validation, and Realization are documented in the [Specification](./docs/specification/INDEX.md).
+The exact contracts for runtime determination, Structure, Validation, and Realization are documented in the [Specification](https://github.com/minoru-jp/shikumi/blob/main/docs/specification/INDEX.md).
 
 ## Official example
 
-[`structure_showcase`](./examples/structure_showcase/README.md) is an executable, domain-light showcase of general structural patterns expressible with `StructureSpecification`.
+[`structure_showcase`](https://github.com/minoru-jp/shikumi/blob/main/examples/structure_showcase/README.md) is an executable, domain-light showcase of general structural patterns expressible with `StructureSpecification`.
 
 Single-feature usage belongs in the verified code examples in the Guides and API Reference. The `examples/` directory is reserved for a composed structural showcase with valid and invalid fixtures.
 
 ## Documentation
 
-- [Guides](./docs/guides/INDEX.md): getting started, Descriptor authoring, project layout, and CLI wiring.
-- [Glossary](./docs/glossary.md): canonical definitions of Shikumi terminology.
-- [API Reference](./docs/api/INDEX.md): public Python API and CLI surface.
-- [Specification](./docs/specification/INDEX.md): semantic and compatibility contracts guaranteed by Shikumi.
-- [STATUS](./STATUS.md): current development stage, compatibility policy, path to 1.0, and known distribution limitations.
-- [CHANGELOG](./CHANGELOG.md): major changes by public release.
+- [Guides](https://github.com/minoru-jp/shikumi/blob/main/docs/guides/INDEX.md): getting started, Descriptor authoring, project layout, and CLI wiring.
+- [Glossary](https://github.com/minoru-jp/shikumi/blob/main/docs/glossary.md): canonical definitions of Shikumi terminology.
+- [API Reference](https://github.com/minoru-jp/shikumi/blob/main/docs/api/INDEX.md): public Python API and CLI surface.
+- [Specification](https://github.com/minoru-jp/shikumi/blob/main/docs/specification/INDEX.md): semantic and compatibility contracts guaranteed by Shikumi.
+- [STATUS](https://github.com/minoru-jp/shikumi/blob/main/STATUS.md): current development stage, compatibility policy, path to 1.0, and known distribution limitations.
+- [CHANGELOG](https://github.com/minoru-jp/shikumi/blob/main/CHANGELOG.md): major changes by public release.
 
 Use the Glossary for concept meaning, the Specification for normative behavior, and the API Reference for name-oriented usage details.
 
 ## License
 
-MIT License. See [`LICENSE`](./LICENSE).
+MIT License. See [`LICENSE`](https://github.com/minoru-jp/shikumi/blob/main/LICENSE).
