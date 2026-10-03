@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Final
+from typing import Final, cast
 
 from ._weak_identity import WeakIdentityRegistry
 from .structure import StructuralKind
@@ -119,7 +119,7 @@ class StructureSelector:
     kind: StructuralKind | None = None
     at: tuple[str, ...] | None = None
     under: tuple[str, ...] | None = None
-    _alternatives: tuple["StructureSelector", ...] = field(
+    _alternatives: tuple[StructureSelector, ...] = field(
         default=(),
         init=False,
         repr=False,
@@ -139,13 +139,15 @@ class StructureSelector:
         object.__setattr__(self, "under", normalized_under)
 
     @classmethod
-    def one_of(cls, *selectors: "StructureSelector") -> "StructureSelector":
+    def one_of(cls, *selectors: StructureSelector) -> StructureSelector:
         """Return a selector matching any of *selectors*."""
 
         if not selectors:
             raise ValueError("StructureSelector.one_of requires at least one selector")
         if any(not isinstance(selector, StructureSelector) for selector in selectors):
-            raise TypeError("StructureSelector.one_of accepts only StructureSelector objects")
+            raise TypeError(
+                "StructureSelector.one_of accepts only StructureSelector objects"
+            )
         combined = cls()
         flattened: list[StructureSelector] = []
         for selector in selectors:
@@ -156,9 +158,9 @@ class StructureSelector:
         object.__setattr__(combined, "_alternatives", tuple(flattened))
         return combined
 
-    def __or__(self, other: "StructureSelector") -> "StructureSelector":
+    def __or__(self, other: StructureSelector) -> StructureSelector:
         if not isinstance(other, StructureSelector):
-            return NotImplemented
+            return NotImplemented  # pyright: ignore[reportUnreachable]
         return self.one_of(self, other)
 
     def matches(self, *, kind: StructuralKind, path: tuple[str, ...]) -> bool:
@@ -173,9 +175,7 @@ class StructureSelector:
             return False
         if self.at is not None and path != self.at:
             return False
-        if self.under is not None and path[: len(self.under)] != self.under:
-            return False
-        return True
+        return self.under is None or path[: len(self.under)] == self.under
 
 
 @dataclass(frozen=True, slots=True, eq=False)
@@ -210,16 +210,19 @@ class DescriptorUseRule:
         if self.name is not None:
             return self.name
 
-        function = getattr(self.descriptor, "__func__", None)
-        bound_to = getattr(self.descriptor, "__self__", None)
+        function = cast(object, getattr(self.descriptor, "__func__", None))
+        bound_to = cast(object, getattr(self.descriptor, "__self__", None))
         if function is not None and bound_to is not None:
             owner = type(bound_to).__name__
-            return f"{owner}.{getattr(function, '__name__', type(function).__name__)}"
+            function_name = cast(object, getattr(function, "__name__", None))
+            if not isinstance(function_name, str):
+                function_name = type(function).__name__
+            return f"{owner}.{function_name}"
 
-        qualname = getattr(self.descriptor, "__qualname__", None)
+        qualname = cast(object, getattr(self.descriptor, "__qualname__", None))
         if isinstance(qualname, str):
             return qualname
-        name = getattr(self.descriptor, "__name__", None)
+        name = cast(object, getattr(self.descriptor, "__name__", None))
         if isinstance(name, str):
             return name
         return type(self.descriptor).__name__

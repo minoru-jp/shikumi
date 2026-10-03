@@ -3,13 +3,14 @@
 from shikumi_devdoc.norms.common import canonical_source
 from shikumi_devdoc.norms.document import test_target_field, title
 
-
 render_command = test_target_field("render command")
 check_command = test_target_field("check command")
+
+
 @canonical_source(
     "devdocs",
     filename="README.md",
-    placeholders=False,
+    merge_policy="local",
     heading="title",
 )
 class DEVDOCS_README:
@@ -23,11 +24,12 @@ class DEVDOCS_README:
         """
         `shikumi-devdoc` はこのリポジトリの文書生成に使う開発時ツールであり、`shikumi` package の実行時依存ではない。
 
-        package としては `shikumi-devdoc` が `shikumi` を利用する。一方、このリポジトリは開発工程で `shikumi-devdoc` を利用する。そのため `shikumi-devdoc` は `[dependency-groups].docs` に固定し、`[project.dependencies]` には追加しない。
+        package としては `shikumi-devdoc` が `shikumi` を利用する。一方、このリポジトリは開発工程で `shikumi-devdoc` を利用する。そのため `shikumi-devdoc` の version 制約は `[dependency-groups].docs` に一元化し、test group は docs group を include して test extra を追加する。CI もこれらの dependency group を利用し、`[project.dependencies]` には追加しない。
 
         文書生成時には checkout 中の `src/shikumi` を import 可能にし、開発中の Shikumi 実装で canonical source を解釈する。
         """
-        title @= '依存関係'
+
+        title @= "依存関係"
 
     class SECTION_002:
         """
@@ -39,7 +41,8 @@ class DEVDOCS_README:
 
         canonical source、canonical document、published document に差異がある場合、文書内容については canonical source を基準とする。文書が説明する Python 実装そのものはこの規則の対象外であり、通常どおり実装側が正本である。
         """
-        title @= '文書の三つの境界'
+
+        title @= "文書の三つの境界"
 
     class SECTION_003:
         """
@@ -52,7 +55,8 @@ class DEVDOCS_README:
 
         Vocabulary term の参照用 Python module は生成しない。文書は Vocabulary の canonical term class を `merge` で直接参照する。Glossary は公開を既定値とし、非公開にする term だけ `glossary @= False` を明示する。
         """
-        title @= 'ワークスペース'
+
+        title @= "ワークスペース"
 
     class SECTION_003A:
         """
@@ -69,7 +73,8 @@ class DEVDOCS_README:
 
         API Reference に設計契約や長い tutorial を混在させない。契約は Specification、実践手順は Guides、概念定義は Glossary へ置く。README は入口と最小例に絞り、詳細な手順を抱え込まない。
         """
-        title @= '文書の責務'
+
+        title @= "文書の責務"
 
     class SECTION_004:
         """
@@ -92,7 +97,8 @@ class DEVDOCS_README:
         5. 翻訳結果を published document の位置へ配置する。
         6. drift、文書上のコード例、リンク、公開名、distribution 配置をテストする。
         """
-        title @= '基本フロー'
+
+        title @= "基本フロー"
 
         render_command @= "python scripts/render_canonical_docs.py"
         check_command @= "python scripts/render_canonical_docs.py --check"
@@ -103,7 +109,8 @@ class DEVDOCS_README:
 
         `scripts/render_canonical_docs.py` が `pyproject.toml` から realization context を構築して `shikumi-devdoc` へ渡す。固定的な生成上の注意事項は `devdocs/config/notice.toml` から明示的に渡す。
         """
-        title @= 'Realization context'
+
+        title @= "Realization context"
 
     class SECTION_006:
         """
@@ -115,7 +122,8 @@ class DEVDOCS_README:
 
         intentionally invalid なコードを掲載する場合は、失敗することが契約として重要なら、その失敗もテストする。
         """
-        title @= '文書上のコード'
+
+        title @= "文書上のコード"
 
     class SECTION_007:
         """
@@ -127,7 +135,8 @@ class DEVDOCS_README:
 
         API Reference、Specification、CHANGELOG などでは `shikumi_devdoc.fields` の標準 field set を目的に応じて利用できる。collection にする場合は各ページを独立 canonical document とし、`@summary(...)` と必要な `order` を metadata として与え、`render index` で `INDEX.md` を別 realization する。
         """
-        title @= '新しい文書を追加する'
+
+        title @= "新しい文書を追加する"
 
     class SECTION_008:
         """
@@ -137,7 +146,8 @@ class DEVDOCS_README:
 
         翻訳中に仕様の不足や曖昧さを見つけた場合は published document だけを補正せず、canonical source を修正して canonical document の生成からやり直す。
         """
-        title @= '翻訳と公開'
+
+        title @= "翻訳と公開"
 
     class SECTION_009:
         """
@@ -147,7 +157,8 @@ class DEVDOCS_README:
 
         `devdocs/` の canonical source と canonical document は sdist に含まれるが、公開 Python API ではない。
         """
-        title @= '配置と配布'
+
+        title @= "配置と配布"
 
     class SECTION_010:
         """
@@ -161,6 +172,7 @@ class DEVDOCS_README:
         - published document のコード、リンク、公開名が壊れていない。
         - distribution 対象文書の配置が packaging test と一致する。
 
-        GitHub Actions の hosted CI でもこれらの検査を実行する。`main` への push と pull request では Python 3.11 から 3.14 の test suite と canonical document の drift 検査を行い、別 job で wheel / sdist を build して distribution 内容も検査する。ローカル検証は引き続き変更を公開する前の基本手順とする。
+        GitHub Actions の hosted CI でもこれらの検査を実行する。`main` への push と pull request では reusable checks を通して Ruff の lint / format check、本体コードの basedpyright、`tests/typing` の consumer typing contract、Python 3.11 から 3.14 の test suite、canonical document の drift 検査を行い、別 job で wheel / sdist を build して distribution 内容も検査する。consumer typing contract は専用の basedpyright 設定で、公開型 API の受理・拒否契約と不要になった ignore を検査する。release workflow も同じ reusable checks を release tag の commit に対して再実行し、成功した場合だけ build / publish へ進む。ローカル検証は引き続き変更を公開する前の基本手順とする。
         """
-        title @= '確認'
+
+        title @= "確認"

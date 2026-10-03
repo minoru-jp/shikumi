@@ -6,7 +6,7 @@ Shikumi enters **Beta** with version 0.2.0. Beta does not mean that the public A
 
 ## Current status
 
-The current public release series is `0.2.x`, with development status **Beta**.
+The current public release is `0.2.3`, in the `0.2.x` release series, with development status **Beta**.
 
 Version 0.2.0 establishes the foundation to be exercised in real projects, including the reorganized documentation system and the expanded Structure regulation API. The Beta period is not intended for redesigning the API from scratch. It is a period for validating the current design through dependent projects and real use while making necessary improvements without unnecessary breakage.
 
@@ -40,6 +40,6 @@ Shikumi is published through PyPI and the public GitHub repository `https://gith
 
 The top-level README uses absolute URLs in the public GitHub repository for its main documentation, official example, and LICENSE links, so the same published documents can be reached both from GitHub and when the README is rendered on PyPI. Package metadata also publishes Homepage, Repository, Documentation, and Issues URLs.
 
-Hosted CI runs on GitHub Actions for pushes and pull requests to `main`. It tests Python 3.11 through 3.14, checks canonical-document drift, builds the wheel and sdist, and verifies the distribution contents.
+Hosted CI runs on GitHub Actions for pushes and pull requests to `main`. Its quality job runs quality checks with Ruff and basedpyright, requiring clean Ruff lint and formatting plus zero basedpyright errors or warnings for the package source. It also runs the dedicated basedpyright consumer typing contract under `tests/typing`, which fixes the intended accept/reject behavior of the public typed API. CI also tests Python 3.11 through 3.14, checks canonical-document drift, builds the wheel and sdist, and verifies the distribution contents.
 
-PyPI publication is separated from ordinary pushes. `.github/workflows/release.yml` runs only when a GitHub Release is published, verifies that the release tag matches the version in `pyproject.toml`, builds the distributions, and publishes them with PyPI Trusted Publishing. The GitHub `pypi` environment and the corresponding Trusted Publisher on PyPI are configured and linked.
+PyPI publication is separated from ordinary pushes. `.github/workflows/release.yml` runs only when a GitHub Release is published and re-runs the same reusable checks as ordinary CI against the release-tag commit: Ruff, package-source basedpyright, the consumer typing contract, canonical-document drift, and the Python 3.11 through 3.14 test suite. Only after those checks succeed and the release tag matches the version in `pyproject.toml` does it build the distributions and publish them with PyPI Trusted Publishing. The GitHub `pypi` environment and the corresponding Trusted Publisher on PyPI are configured and linked.

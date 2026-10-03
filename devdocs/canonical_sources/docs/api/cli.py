@@ -1,23 +1,32 @@
 """Canonical Japanese API reference source for CLI Reference."""
 
-from devdocs.canonical_sources.docs.vocabulary import TERMS
 from shikumi_devdoc.fields.api_reference import (
-    NAMESPACE, OPERATION, OTHER, TYPE, VALUE,
-    input, kind, name, output, related,
+    OPERATION,
+    VALUE,
+    input,
+    kind,
+    name,
+    output,
+    related,
 )
 from shikumi_devdoc.norms.common import canonical_source, merge, summary
 from shikumi_devdoc.norms.document import title
-from devdocs.canonical_sources.docs.specification.cli import SPECIFICATION_PART as CLI_SPEC
 
-@summary('shikumi CLI の command と option。')
-@canonical_source('CLI Reference', filename='cli.md', order=90, heading="title")
+from devdocs.canonical_sources.docs.specification.cli import (
+    SPECIFICATION_PART as CLI_SPEC,
+)
+from devdocs.canonical_sources.docs.vocabulary import TERMS
+
+
+@summary("shikumi CLI の command と option。")
+@canonical_source("CLI Reference", filename="cli.md", order=90, heading="title")
 class API_REFERENCE_PART:
     """CLI の command line surface。意味上の契約は CLI Specification に分離する。"""
 
     related @= CLI_SPEC
 
     class TITLE_85:
-        r'''
+        r"""
         {{TERM_1}} は、{{TERM_3}}が公開する `{{TERM_1}}`、{{TERM_5}}となる Python object、独立した{{TERM_26}}を実行時に結線する薄い CLI を提供する。
 
         CLI は{{TERM_3}}、{{TERM_5}}、{{TERM_26}}の登録・探索・所有関係を管理しない。指定された Python 参照を通常の import によって読み込み、その場で処理する。
@@ -31,8 +40,9 @@ class API_REFERENCE_PART:
         ```
 
         `--shikumi` と `--realizer` は `module:object` を要求する。`--body` は module/package 自体を指定する場合は `module`、{{TERM_11}}を{{TERM_20}}にする場合は `module:object` を使用できる。
-        '''
-        title @= 'CLI: `{{PROJECT.cli_entry_point}}`'
+        """
+
+        title @= "CLI: `{{PROJECT.cli_entry_point}}`"
 
         merge @= TERMS.TERM_1
         merge @= TERMS.TERM_3
@@ -42,7 +52,7 @@ class API_REFERENCE_PART:
         merge @= TERMS.TERM_20
 
         class TITLE_86:
-            r'''
+            r"""
             ```bash
             {{PROJECT.cli_entry_point}} validate \
               --shikumi SPEC_MODULE:SHIKUMI \
@@ -67,21 +77,21 @@ class API_REFERENCE_PART:
             {{TERM_21}}と、指定されている場合の{{TERM_27}}検査の双方に error がなければ exit code `0`、一件以上あれば `1` を返す。warning / info のみの場合は `0` とする。
 
             `validate` は{{TERM_28}}を生成しない。
-            '''
-            title @= '`validate`'
+            """
+
+            title @= "`validate`"
             related @= CLI_SPEC.CLI_005
             related @= CLI_SPEC.CLI_006
 
-            name @= 'validate'
+            name @= "validate"
             kind @= OPERATION
-            input @= '--shikumi'
-            input @= '--body'
-            input @= '--at'
-            input @= '--structure-spec | --structure-from'
-            input @= '--realizer'
-            input @= '--format'
-            output @= 'exit status 0 or 1'
-
+            input @= "--shikumi"
+            input @= "--body"
+            input @= "--at"
+            input @= "--structure-spec | --structure-from"
+            input @= "--realizer"
+            input @= "--format"
+            output @= "exit status 0 or 1"
 
             merge @= TERMS.TERM_5
             merge @= TERMS.TERM_11
@@ -96,7 +106,7 @@ class API_REFERENCE_PART:
             merge @= TERMS.TERM_2
 
         class TITLE_87:
-            r'''
+            r"""
             ```bash
             {{PROJECT.cli_entry_point}} realize \
               --shikumi SPEC_MODULE:SHIKUMI \
@@ -118,21 +128,21 @@ class API_REFERENCE_PART:
             - JSON serialization 可能な Python 値: UTF-8 JSON として書き出す
 
             それ以外の{{TERM_28}}を返す{{TERM_26}}は、CLI の標準出力契約では直接利用できない。
-            '''
-            title @= '`realize`'
+            """
+
+            title @= "`realize`"
             related @= CLI_SPEC.CLI_007
             related @= CLI_SPEC.CLI_008
 
-            name @= 'realize'
+            name @= "realize"
             kind @= OPERATION
-            input @= '--shikumi'
-            input @= '--body'
-            input @= '--at'
-            input @= '--realizer'
-            input @= '--output'
-            input @= '--format'
-            output @= 'output file + CLI response'
-
+            input @= "--shikumi"
+            input @= "--body"
+            input @= "--at"
+            input @= "--realizer"
+            input @= "--output"
+            input @= "--format"
+            output @= "output file + CLI response"
 
             merge @= TERMS.TERM_5
             merge @= TERMS.TERM_19
@@ -144,7 +154,7 @@ class API_REFERENCE_PART:
             merge @= TERMS.TERM_26
 
         class TITLE_88:
-            r'''
+            r"""
             ```text
             text
             json
@@ -190,18 +200,17 @@ class API_REFERENCE_PART:
             {{TERM_25}}時に `--output` を指定した場合、{{TERM_28}}はそのファイルへ書き出し、stdout には CLI 応答だけを出力する。この分離により、{{TERM_28}}自体が JSON であっても `--format json` の CLI 応答と混在しない。
 
             CLI が処理できる import、{{TERM_18}}、{{TERM_21}}、{{TERM_25}}、{{TERM_28}}書き出しの失敗は、`json` 形式では `ok: false` と `error.type` / `error.message` を持つ構造化応答として報告する。
-            '''
-            title @= '`--format`'
+            """
+
+            title @= "`--format`"
             related @= CLI_SPEC.CLI_009
             related @= CLI_SPEC.CLI_010
 
-            name @= '--format'
+            name @= "--format"
             kind @= VALUE
-
 
             merge @= TERMS.TERM_26
             merge @= TERMS.TERM_28
             merge @= TERMS.TERM_25
             merge @= TERMS.TERM_18
             merge @= TERMS.TERM_21
-

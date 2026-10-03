@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterator
-from typing import Any
+from typing import Any, cast
 
 from ..information import Cardinality, InformationType
 from ..structure import StructuralKind
@@ -33,10 +33,11 @@ def information_type_rule(
             )
 
         for record in records:
-            if not information_type.accepts(record.value):
+            value = cast(object, record.value)
+            if not information_type.accepts(value):
                 yield Diagnostic(
                     f"information {information_type.name!r} does not accept value "
-                    f"of type {type(record.value).__name__}",
+                    f"of type {type(value).__name__}",
                     code="information.value_type",
                 )
 

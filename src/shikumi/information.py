@@ -2,14 +2,16 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, Final, Generic, Iterable, TypeVar, cast
+from typing import Any, Final, Generic, TypeVar
 
 from ._weak_identity import WeakIdentityRegistry
 
-
 T = TypeVar("T")
+
+_DEFAULT_VALUE_TYPE: type[Any] = object
 
 
 class Cardinality(str, Enum):
@@ -28,7 +30,7 @@ class InformationType(Generic[T]):
     """
 
     name: str
-    value_type: type[T] | tuple[type[Any], ...] = cast(type[T], object)
+    value_type: type[T] | tuple[type[Any], ...] = _DEFAULT_VALUE_TYPE
     cardinality: Cardinality = Cardinality.ONE
 
     def __post_init__(self) -> None:
@@ -52,7 +54,7 @@ class InformationType(Generic[T]):
             )
         for item in candidates:
             try:
-                isinstance(None, item)
+                _ = isinstance(None, item)
             except TypeError as exc:
                 raise TypeError(
                     "information type value_type must be usable with isinstance"
@@ -110,7 +112,7 @@ def attach_information(
     """
 
     if not isinstance(information_type, InformationType):
-        raise TypeError("information_type must be an InformationType")
+        raise TypeError("information_type must be an InformationType")  # pyright: ignore[reportUnreachable]
 
     _INFORMATION.append(
         subject,

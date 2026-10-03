@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from inspect import cleandoc
 import os
 import re
-from pathlib import Path
 import subprocess
+from inspect import cleandoc
+from pathlib import Path
 
 from shikumi_devdoc.norms._document import DocumentField, FieldPresentation, FieldValue
 from shikumi_devdoc.norms.document import system as document_system
@@ -18,11 +18,14 @@ from devdocs.canonical_sources.docs.api import shikumi as shikumi_api_doc
 from devdocs.canonical_sources.docs.api import standard as standard_api_doc
 from devdocs.canonical_sources.docs.api import structure as structure_api_doc
 from devdocs.canonical_sources.docs.api import validation as validation_api_doc
-from devdocs.canonical_sources.docs.guides import descriptor_authoring as descriptor_authoring_doc
+from devdocs.canonical_sources.docs.guides import (
+    descriptor_authoring as descriptor_authoring_doc,
+)
 from devdocs.canonical_sources.docs.guides import getting_started as getting_started_doc
 from devdocs.canonical_sources.docs.guides import project_layout as project_layout_doc
-from devdocs.canonical_sources.examples.structure_showcase import canonical as structure_showcase_doc
-
+from devdocs.canonical_sources.examples.structure_showcase import (
+    canonical as structure_showcase_doc,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -44,7 +47,7 @@ def _test_target_value(module, subject: type[object], binding_name: str) -> str:
 
 def _execute(code: str, name: str) -> dict[str, object]:
     namespace: dict[str, object] = {}
-    exec(compile(code, name, "exec"), namespace, namespace)
+    exec(compile(code, name, "exec"), namespace, namespace)  # noqa: S102 - trusted in-test source is executed intentionally
     return namespace
 
 
@@ -81,7 +84,9 @@ def test_getting_started_complete_example_executes() -> None:
 
 
 def test_project_layout_validate_command_executes(tmp_path: Path) -> None:
-    code = _test_target_value(project_layout_doc, project_layout_doc.GUIDE.CLI, "validate_command")
+    code = _test_target_value(
+        project_layout_doc, project_layout_doc.GUIDE.CLI, "validate_command"
+    )
     completed = _execute_bash(code, tmp_path)
     assert completed.returncode == 0, completed.stderr
     assert "valid" in completed.stdout.lower()
@@ -267,18 +272,66 @@ def test_published_documents_preserve_all_test_targets_verbatim() -> None:
     documents = (
         (readme, readme.README, Path("README.md")),
         (devdocs_readme, devdocs_readme.DEVDOCS_README, Path("devdocs/README.md")),
-        (getting_started_doc, getting_started_doc.GUIDE, Path("docs/guides/getting-started.md")),
-        (descriptor_authoring_doc, descriptor_authoring_doc.GUIDE, Path("docs/guides/descriptor-authoring.md")),
-        (project_layout_doc, project_layout_doc.GUIDE, Path("docs/guides/project-layout.md")),
-        (information_api_doc, information_api_doc.API_REFERENCE_PART, Path("docs/api/information.md")),
-        (descriptor_api_doc, descriptor_api_doc.API_REFERENCE_PART, Path("docs/api/descriptors.md")),
-        (structure_api_doc, structure_api_doc.API_REFERENCE_PART, Path("docs/api/structure.md")),
-        (semantic_view_api_doc, semantic_view_api_doc.API_REFERENCE_PART, Path("docs/api/semantic-view.md")),
-        (shikumi_api_doc, shikumi_api_doc.API_REFERENCE_PART, Path("docs/api/shikumi.md")),
-        (validation_api_doc, validation_api_doc.API_REFERENCE_PART, Path("docs/api/validation.md")),
-        (realization_api_doc, realization_api_doc.API_REFERENCE_PART, Path("docs/api/realization.md")),
-        (standard_api_doc, standard_api_doc.API_REFERENCE_PART, Path("docs/api/standard.md")),
-        (structure_showcase_doc, structure_showcase_doc.EXAMPLE, Path("examples/structure_showcase/README.md")),
+        (
+            getting_started_doc,
+            getting_started_doc.GUIDE,
+            Path("docs/guides/getting-started.md"),
+        ),
+        (
+            descriptor_authoring_doc,
+            descriptor_authoring_doc.GUIDE,
+            Path("docs/guides/descriptor-authoring.md"),
+        ),
+        (
+            project_layout_doc,
+            project_layout_doc.GUIDE,
+            Path("docs/guides/project-layout.md"),
+        ),
+        (
+            information_api_doc,
+            information_api_doc.API_REFERENCE_PART,
+            Path("docs/api/information.md"),
+        ),
+        (
+            descriptor_api_doc,
+            descriptor_api_doc.API_REFERENCE_PART,
+            Path("docs/api/descriptors.md"),
+        ),
+        (
+            structure_api_doc,
+            structure_api_doc.API_REFERENCE_PART,
+            Path("docs/api/structure.md"),
+        ),
+        (
+            semantic_view_api_doc,
+            semantic_view_api_doc.API_REFERENCE_PART,
+            Path("docs/api/semantic-view.md"),
+        ),
+        (
+            shikumi_api_doc,
+            shikumi_api_doc.API_REFERENCE_PART,
+            Path("docs/api/shikumi.md"),
+        ),
+        (
+            validation_api_doc,
+            validation_api_doc.API_REFERENCE_PART,
+            Path("docs/api/validation.md"),
+        ),
+        (
+            realization_api_doc,
+            realization_api_doc.API_REFERENCE_PART,
+            Path("docs/api/realization.md"),
+        ),
+        (
+            standard_api_doc,
+            standard_api_doc.API_REFERENCE_PART,
+            Path("docs/api/standard.md"),
+        ),
+        (
+            structure_showcase_doc,
+            structure_showcase_doc.EXAMPLE,
+            Path("examples/structure_showcase/README.md"),
+        ),
     )
 
     for module, root, published_path in documents:
@@ -287,7 +340,9 @@ def test_published_documents_preserve_all_test_targets_verbatim() -> None:
         published = published_path.read_text(encoding="utf-8")
         fenced_blocks = tuple(
             block.rstrip("\n")
-            for block in re.findall(r"```[^\n]*\n(.*?)\n```", published, flags=re.DOTALL)
+            for block in re.findall(
+                r"```[^\n]*\n(.*?)\n```", published, flags=re.DOTALL
+            )
         )
         target_values = [
             cleandoc(value.value)

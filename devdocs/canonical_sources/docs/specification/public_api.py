@@ -1,13 +1,22 @@
 """Public API boundary specification."""
 
-from shikumi_devdoc.fields.specification import INFORMATIVE, MUST, MUST_NOT, detail, level, related
+from shikumi_devdoc.fields.specification import (
+    INFORMATIVE,
+    MUST,
+    MUST_NOT,
+    level,
+    related,
+)
 from shikumi_devdoc.norms.common import canonical_source, summary
 from shikumi_devdoc.norms.document import title
+
 from devdocs.canonical_sources.docs.specification.core import SPECIFICATION_PART as CORE
 
 
 @summary("Core、Standard、内部実装の公開境界。")
-@canonical_source("Public API Boundary", filename="public-api.md", order=50, heading="identity")
+@canonical_source(
+    "Public API Boundary", filename="public-api.md", order=50, heading="identity"
+)
 class SPECIFICATION_PART:
     """Shikumi distribution が利用者へ約束する import surface。"""
 
@@ -39,5 +48,7 @@ class SPECIFICATION_PART:
     class API_005:
         """独自 decorator、metaclass、base class、mixin が Python 標準の class creation や記述器実行順序を変更する組合せについて、Shikumi は互換処理を保証しない。"""
 
-        title @= "Python class-creation interactions are outside compatibility guarantees"
+        title @= (
+            "Python class-creation interactions are outside compatibility guarantees"
+        )
         level @= INFORMATIVE

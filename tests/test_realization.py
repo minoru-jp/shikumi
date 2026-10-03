@@ -52,7 +52,7 @@ def test_realizer_consumes_an_existing_semantic_view() -> None:
 def test_multiple_realizers_can_consume_the_same_view() -> None:
     title = InformationType("title", str)
     module = types.ModuleType("docs.pages")
-    exec(compile("class Page: pass", "<docs.pages>", "exec"), module.__dict__)
+    exec(compile("class Page: pass", "<docs.pages>", "exec"), module.__dict__)  # noqa: S102 - trusted in-test source is executed intentionally
 
     try:
         attach_information(module.Page, title, "Overview")
@@ -100,7 +100,11 @@ def test_realizer_check_can_report_realizability_without_realizing() -> None:
             calls.append("check")
             return RealizationCheck(
                 view,
-                (Diagnostic("required information is missing", code="realizer.required"),),
+                (
+                    Diagnostic(
+                        "required information is missing", code="realizer.required"
+                    ),
+                ),
             )
 
         def realize(self, view: SemanticView) -> str:

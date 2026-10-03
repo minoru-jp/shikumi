@@ -18,7 +18,7 @@ from shikumi import (
 
 def _module(name: str, source: str) -> types.ModuleType:
     module = types.ModuleType(name)
-    exec(compile(source, f"<{name}>", "exec"), module.__dict__)
+    exec(compile(source, f"<{name}>", "exec"), module.__dict__)  # noqa: S102 - trusted in-test source is executed intentionally
     return module
 
 
@@ -194,9 +194,8 @@ def test_duplicate_descriptor_rule_object_is_rejected() -> None:
 
 
 def test_structure_selectors_can_express_alternative_locations() -> None:
-    selector = (
-        StructureSelector(kind=StructuralKind.MODULE)
-        | StructureSelector(kind=StructuralKind.ENTITY, under=("api",))
+    selector = StructureSelector(kind=StructuralKind.MODULE) | StructureSelector(
+        kind=StructuralKind.ENTITY, under=("api",)
     )
 
     assert selector.matches(kind=StructuralKind.MODULE, path=("internal",))

@@ -1,14 +1,21 @@
 """Validation semantics specification."""
 
-from shikumi_devdoc.fields.specification import MUST, MUST_NOT, detail, level, related
+from shikumi_devdoc.fields.specification import MUST, MUST_NOT, level, related
 from shikumi_devdoc.norms.common import canonical_source, summary
 from shikumi_devdoc.norms.document import title
-from devdocs.canonical_sources.docs.specification.description import SPECIFICATION_PART as DESCRIPTION
-from devdocs.canonical_sources.docs.specification.structure import SPECIFICATION_PART as STRUCTURE
+
+from devdocs.canonical_sources.docs.specification.description import (
+    SPECIFICATION_PART as DESCRIPTION,
+)
+from devdocs.canonical_sources.docs.specification.structure import (
+    SPECIFICATION_PART as STRUCTURE,
+)
 
 
 @summary("検証規則、診断、構造検証、記述器使用検証の契約。")
-@canonical_source("Validation Semantics", filename="validation.md", order=30, heading="identity")
+@canonical_source(
+    "Validation Semantics", filename="validation.md", order=30, heading="identity"
+)
 class SPECIFICATION_PART:
     """SemanticView に対する validation の契約。"""
 

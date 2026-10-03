@@ -4,14 +4,24 @@ import json
 import sys
 from pathlib import Path
 
+from shikumi import DiagnosticSeverity
+from shikumi._cli.payload import diagnostic_counts
+from shikumi._cli.types import DiagnosticCountsPayload
 from shikumi.cli import main
+
+
+def test_diagnostic_counts_stays_in_sync_with_severity_enum() -> None:
+    expected = {severity.value for severity in DiagnosticSeverity}
+
+    assert set(DiagnosticCountsPayload.__annotations__) == expected
+    assert set(diagnostic_counts(())) == expected
 
 
 def _write_fixture(tmp_path: Path) -> str:
     package = tmp_path / "cli_fixture"
     package.mkdir()
     (package / "__init__.py").write_text(
-        "\n".join(
+        "\n".join(  # noqa: FLY002 - line list is clearer for generated fixture source
             [
                 "from shikumi import Diagnostic, InformationType, RealizationCheck, Realizer, Shikumi, StructuralKind, StructureElement, StructureSpecification, validator",
                 "from shikumi.standard import assignment",
@@ -53,9 +63,18 @@ def _write_fixture(tmp_path: Path) -> str:
         ),
         encoding="utf-8",
     )
-    (package / "reference_module.py").write_text("from cli_fixture import title\nclass Item:\n    title @= 'Item'\n", encoding="utf-8")
-    (package / "candidate_module.py").write_text("from cli_fixture import title\nclass Item:\n    title @= 'Item'\n", encoding="utf-8")
-    (package / "wrong_module.py").write_text("from cli_fixture import title\nclass Other:\n    title @= 'Other'\n", encoding="utf-8")
+    (package / "reference_module.py").write_text(
+        "from cli_fixture import title\nclass Item:\n    title @= 'Item'\n",
+        encoding="utf-8",
+    )
+    (package / "candidate_module.py").write_text(
+        "from cli_fixture import title\nclass Item:\n    title @= 'Item'\n",
+        encoding="utf-8",
+    )
+    (package / "wrong_module.py").write_text(
+        "from cli_fixture import title\nclass Other:\n    title @= 'Other'\n",
+        encoding="utf-8",
+    )
     return "cli_fixture"
 
 
@@ -228,7 +247,9 @@ def test_reference_error_uses_requested_response_format(capsys) -> None:
     assert payload["error"]["type"] == "import_error"
 
 
-def test_realize_wraps_interpretation_error_for_json(tmp_path, monkeypatch, capsys) -> None:
+def test_realize_wraps_interpretation_error_for_json(
+    tmp_path, monkeypatch, capsys
+) -> None:
     package = _write_fixture(tmp_path)
     monkeypatch.syspath_prepend(str(tmp_path))
     output = tmp_path / "artifact.txt"
@@ -255,7 +276,9 @@ def test_realize_wraps_interpretation_error_for_json(tmp_path, monkeypatch, caps
         _drop_modules(package)
 
 
-def test_validate_module_requires_explicit_placement(tmp_path, monkeypatch, capsys) -> None:
+def test_validate_module_requires_explicit_placement(
+    tmp_path, monkeypatch, capsys
+) -> None:
     package = _write_fixture(tmp_path)
     monkeypatch.syspath_prepend(str(tmp_path))
     try:
@@ -277,7 +300,9 @@ def test_validate_module_requires_explicit_placement(tmp_path, monkeypatch, caps
         _drop_modules(package)
 
 
-def test_validate_uses_explicit_structure_specification(tmp_path, monkeypatch, capsys) -> None:
+def test_validate_uses_explicit_structure_specification(
+    tmp_path, monkeypatch, capsys
+) -> None:
     package = _write_fixture(tmp_path)
     monkeypatch.syspath_prepend(str(tmp_path))
     try:
@@ -309,7 +334,9 @@ def test_validate_uses_explicit_structure_specification(tmp_path, monkeypatch, c
         _drop_modules(package)
 
 
-def test_validate_can_derive_structure_from_description_body(tmp_path, monkeypatch, capsys) -> None:
+def test_validate_can_derive_structure_from_description_body(
+    tmp_path, monkeypatch, capsys
+) -> None:
     package = _write_fixture(tmp_path)
     monkeypatch.syspath_prepend(str(tmp_path))
     try:
@@ -363,7 +390,9 @@ def test_explicit_structure_reference_does_not_fall_back_when_missing(
         _drop_modules(package)
 
 
-def test_validate_can_query_realizer_without_realizing(tmp_path, monkeypatch, capsys) -> None:
+def test_validate_can_query_realizer_without_realizing(
+    tmp_path, monkeypatch, capsys
+) -> None:
     package = _write_fixture(tmp_path)
     monkeypatch.syspath_prepend(str(tmp_path))
     try:
@@ -389,7 +418,9 @@ def test_validate_can_query_realizer_without_realizing(tmp_path, monkeypatch, ca
         _drop_modules(package)
 
 
-def test_validate_reports_structural_mismatch_separately(tmp_path, monkeypatch, capsys) -> None:
+def test_validate_reports_structural_mismatch_separately(
+    tmp_path, monkeypatch, capsys
+) -> None:
     package = _write_fixture(tmp_path)
     monkeypatch.syspath_prepend(str(tmp_path))
     try:

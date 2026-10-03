@@ -49,14 +49,14 @@ from .view import SemanticView, ViewItem
 
 __all__ = [
     "Cardinality",
-    "Diagnostic",
-    "DiagnosticSeverity",
     "DescriptorUse",
     "DescriptorUseRule",
+    "Diagnostic",
+    "DiagnosticSeverity",
     "Focus",
-    "LogicalStructureElement",
     "Information",
     "InformationType",
+    "LogicalStructureElement",
     "PythonStructure",
     "RealizationCheck",
     "Realizer",

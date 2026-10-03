@@ -8,8 +8,13 @@ permissions:
   contents: read
 
 jobs:
+  checks:
+    name: Quality and tests
+    uses: ./.github/workflows/checks.yml
+
   build:
     name: Build release distributions
+    needs: checks
     runs-on: ubuntu-latest
 
     steps:

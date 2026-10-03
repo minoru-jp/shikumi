@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import shikumi
-import shikumi.standard as standard
+from shikumi import standard
 
 
 def test_core_public_surface_matches_api_reference_layering() -> None:

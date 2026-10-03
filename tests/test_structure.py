@@ -14,7 +14,7 @@ from shikumi import (
 
 def _module(name: str, source: str) -> types.ModuleType:
     module = types.ModuleType(name)
-    exec(compile(source, f"<{name}>", "exec"), module.__dict__)
+    exec(compile(source, f"<{name}>", "exec"), module.__dict__)  # noqa: S102 - trusted in-test source is executed intentionally
     return module
 
 
@@ -33,7 +33,7 @@ def test_module_focus_contains_only_locally_defined_classes() -> None:
     external = _module("example.external", "class Imported: pass")
     module = types.ModuleType("example.page")
     module.Imported = external.Imported
-    exec(compile("class Local: pass", "<example.page>", "exec"), module.__dict__)
+    exec(compile("class Local: pass", "<example.page>", "exec"), module.__dict__)  # noqa: S102 - trusted in-test source is executed intentionally
 
     resolved = PythonStructure().resolve(Focus(module))
 
@@ -174,7 +174,9 @@ def test_resolved_structure_rejects_nodes_outside_focus_root() -> None:
             focus=focus,
             nodes=(
                 StructureNode(root, StructuralKind.MODULE, "root", ("root",)),
-                StructureNode(child, StructuralKind.ENTITY, "Child", ("other", "Child")),
+                StructureNode(
+                    child, StructuralKind.ENTITY, "Child", ("other", "Child")
+                ),
             ),
         )
 

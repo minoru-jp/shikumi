@@ -1,2 +1,1 @@
-"""Canonical sources for repository documentation authoring.
-"""
+"""Canonical sources for repository documentation authoring."""

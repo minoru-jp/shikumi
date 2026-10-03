@@ -4,18 +4,15 @@ from __future__ import annotations
 
 import json
 
-from .types import CLIError
+from .types import CLIError, RealizationPayload, ValidationPayload
 
 
-def render_validation_text(payload: dict[str, object]) -> str:
-    ok = bool(payload["ok"])
+def render_validation_text(payload: ValidationPayload) -> str:
     counts = payload["diagnostic_counts"]
-    assert isinstance(counts, dict)
     diagnostics = payload["diagnostics"]
-    assert isinstance(diagnostics, list)
 
     lines = [
-        "Validation succeeded" if ok else "Validation failed",
+        "Validation succeeded" if payload["ok"] else "Validation failed",
         f"Shikumi: {payload['shikumi']}",
         f"Body: {payload['body']}",
         f"Focus: {payload['focus_kind']}",
@@ -25,7 +22,6 @@ def render_validation_text(payload: dict[str, object]) -> str:
 
     structure = payload["structure"]
     if structure is not None:
-        assert isinstance(structure, dict)
         state = "succeeded" if structure["ok"] else "failed"
         lines.append(
             f"Structure: {state} ({structure['mode']}: {structure['reference']})"
@@ -33,7 +29,6 @@ def render_validation_text(payload: dict[str, object]) -> str:
 
     realization = payload["realization"]
     if realization is not None:
-        assert isinstance(realization, dict)
         state = "realizable" if realization["ok"] else "not realizable"
         lines.append(f"Realizer: {state} ({realization['realizer']})")
 
@@ -44,8 +39,7 @@ def render_validation_text(payload: dict[str, object]) -> str:
     if diagnostics:
         lines.append("")
     for item in diagnostics:
-        assert isinstance(item, dict)
-        severity = str(item["severity"]).upper()
+        severity = item["severity"].upper()
         code = item["code"]
         subject = item["subject"]
         header = severity
@@ -57,11 +51,8 @@ def render_validation_text(payload: dict[str, object]) -> str:
         lines.append(f"  {item['message']}")
 
     if realization is not None:
-        assert isinstance(realization, dict)
         rdiagnostics = realization["diagnostics"]
         rcounts = realization["diagnostic_counts"]
-        assert isinstance(rdiagnostics, list)
-        assert isinstance(rcounts, dict)
         lines.append(
             "Realizability diagnostics: "
             f"{rcounts['error']} error, {rcounts['warning']} warning, {rcounts['info']} info"
@@ -69,8 +60,7 @@ def render_validation_text(payload: dict[str, object]) -> str:
         if rdiagnostics:
             lines.append("")
         for item in rdiagnostics:
-            assert isinstance(item, dict)
-            severity = str(item["severity"]).upper()
+            severity = item["severity"].upper()
             code = item["code"]
             subject = item["subject"]
             header = severity
@@ -84,9 +74,8 @@ def render_validation_text(payload: dict[str, object]) -> str:
     return "\n".join(lines) + "\n"
 
 
-def render_realization_text(payload: dict[str, object]) -> str:
+def render_realization_text(payload: RealizationPayload) -> str:
     artifact = payload["artifact"]
-    assert isinstance(artifact, dict)
     lines = [
         "Realization succeeded",
         f"Shikumi: {payload['shikumi']}",
@@ -108,7 +97,7 @@ def render_error_text(error: CLIError) -> str:
     return f"Error [{error.error_type}]: {error.message}\n"
 
 
-def emit(payload: dict[str, object], *, output_format: str, text: str) -> None:
+def emit(payload: object, *, output_format: str, text: str) -> None:
     if output_format == "json":
         print(json.dumps(payload, ensure_ascii=False, indent=2, allow_nan=False))
     else:

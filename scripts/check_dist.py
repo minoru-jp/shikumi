@@ -5,7 +5,6 @@ import tarfile
 import zipfile
 from pathlib import Path
 
-
 REQUIRED_WHEEL_SUFFIXES = {
     "shikumi/__init__.py",
     "shikumi/py.typed",
@@ -68,7 +67,11 @@ def check_wheel(path: Path) -> None:
     _assert_no_forbidden_parts(
         names, archive=path, forbidden_parts=WHEEL_FORBIDDEN_PARTS
     )
-    missing = [suffix for suffix in REQUIRED_WHEEL_SUFFIXES if not any(name.endswith(suffix) for name in names)]
+    missing = [
+        suffix
+        for suffix in REQUIRED_WHEEL_SUFFIXES
+        if not any(name.endswith(suffix) for name in names)
+    ]
     if missing:
         raise SystemExit(f"{path.name}: required wheel files missing: {missing}")
 
@@ -110,7 +113,11 @@ def check_sdist(path: Path) -> None:
         "scripts/check_dist.py",
         "scripts/render_canonical_docs.py",
     }
-    missing = [suffix for suffix in required_suffixes if not any(name.endswith(suffix) for name in names)]
+    missing = [
+        suffix
+        for suffix in required_suffixes
+        if not any(name.endswith(suffix) for name in names)
+    ]
     if missing:
         raise SystemExit(f"{path.name}: required sdist files missing: {missing}")
 

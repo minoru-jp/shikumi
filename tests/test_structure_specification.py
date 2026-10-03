@@ -15,7 +15,7 @@ from shikumi import (
 
 def _module(name: str, source: str) -> types.ModuleType:
     module = types.ModuleType(name)
-    exec(compile(source, f"<{name}>", "exec"), module.__dict__)
+    exec(compile(source, f"<{name}>", "exec"), module.__dict__)  # noqa: S102 - trusted in-test source is executed intentionally
     return module
 
 
@@ -137,6 +137,47 @@ def test_structure_check_rejects_an_undefined_placement() -> None:
     assert result.diagnostics[0].code == "structure.placement.undefined"
 
 
+def _open_subtree_spec() -> StructureSpecification:
+    from shikumi import StructureFragment
+
+    return StructureSpecification(
+        [
+            StructureElement((), StructuralKind.PACKAGE),
+            StructureElement(("EXCEPTION",), StructuralKind.PACKAGE),
+            StructureElement(("known",), StructuralKind.MODULE),
+        ],
+        mounts=(
+            StructureFragment.unconstrained(StructuralKind.PACKAGE).at(("EXCEPTION",)),
+        ),
+    )
+
+
+def test_placement_below_an_unconstrained_subtree_is_accepted() -> None:
+    module = _module("scratch.generated", "class Item: pass")
+
+    result = Shikumi().validate(
+        Focus(module, placement=("EXCEPTION", "anything", "deep")),
+        structure_specification=_open_subtree_spec(),
+    )
+
+    assert result.is_valid
+    assert not result.diagnostics
+
+
+def test_undefined_placement_is_rejected_on_the_dynamic_path() -> None:
+    module = _module("scratch.generated", "class Item: pass")
+
+    result = Shikumi().validate(
+        Focus(module, placement=("unknown",)),
+        structure_specification=_open_subtree_spec(),
+    )
+
+    assert not result.is_valid
+    assert [diagnostic.code for diagnostic in result.diagnostics] == [
+        "structure.placement.undefined"
+    ]
+
+
 def _resolved_structure(
     entries: list[tuple[tuple[str, ...], StructuralKind]],
     *,
@@ -231,7 +272,10 @@ def test_logical_structure_element_applies_one_rule_to_arbitrary_names() -> None
     result = check_structure(structure, specification)
 
     assert result.is_valid
-    assert [(item.logical_element.logical_name, item.actual_path) for item in result.bindings] == [
+    assert [
+        (item.logical_element.logical_name, item.actual_path)
+        for item in result.bindings
+    ] == [
         ("actor", ("INTERACTION", "USER")),
         ("actor", ("INTERACTION", "ADMIN")),
     ]
@@ -361,15 +405,13 @@ def test_logical_structure_element_enforces_cardinality() -> None:
         specification,
     )
 
-    assert [item.code for item in missing.diagnostics] == [
-        "structure.logical.minimum"
-    ]
-    assert [item.code for item in too_many.diagnostics] == [
-        "structure.logical.maximum"
-    ]
+    assert [item.code for item in missing.diagnostics] == ["structure.logical.minimum"]
+    assert [item.code for item in too_many.diagnostics] == ["structure.logical.maximum"]
 
 
-def test_structure_specification_rejects_multiple_logical_elements_at_one_parent() -> None:
+def test_structure_specification_rejects_multiple_logical_elements_at_one_parent() -> (
+    None
+):
     from shikumi import LogicalStructureElement, StructureFragment
 
     fragment = StructureFragment([StructureElement((), StructuralKind.PACKAGE)])
@@ -396,8 +438,13 @@ def test_structure_specification_rejects_multiple_logical_elements_at_one_parent
 
 
 def test_placement_can_traverse_a_logical_structure_element() -> None:
-    from shikumi import LogicalStructureElement, ResolvedStructure, StructureFragment
-    from shikumi import StructureNode, check_structure
+    from shikumi import (
+        LogicalStructureElement,
+        ResolvedStructure,
+        StructureFragment,
+        StructureNode,
+        check_structure,
+    )
 
     actor = StructureFragment(
         [
@@ -439,7 +486,9 @@ def test_placement_can_traverse_a_logical_structure_element() -> None:
     assert result.bindings[0].actual_path == ("INTERACTION", "USER")
 
 
-def test_logical_structure_elements_can_be_nested_for_free_and_enumerated_names() -> None:
+def test_logical_structure_elements_can_be_nested_for_free_and_enumerated_names() -> (
+    None
+):
     from shikumi import LogicalStructureElement, StructureFragment, check_structure
 
     medium = StructureFragment([StructureElement((), StructuralKind.PACKAGE)])
@@ -595,7 +644,10 @@ def test_logical_structure_element_checks_bound_instance_kind() -> None:
     result = check_structure(structure, specification)
 
     assert [item.code for item in result.diagnostics] == ["structure.kind.mismatch"]
-    assert [(item.logical_element.logical_name, item.actual_path) for item in result.bindings] == [
+    assert [
+        (item.logical_element.logical_name, item.actual_path)
+        for item in result.bindings
+    ] == [
         ("actor", ("INTERACTION", "USER")),
     ]
 
@@ -664,9 +716,7 @@ def test_explicit_exception_does_not_count_toward_logical_cardinality() -> None:
 
     result = check_structure(structure, specification)
 
-    assert [item.code for item in result.diagnostics] == [
-        "structure.logical.minimum"
-    ]
+    assert [item.code for item in result.diagnostics] == ["structure.logical.minimum"]
     assert result.bindings == ()
 
 
@@ -710,9 +760,7 @@ def test_optional_exact_element_activates_required_descendants_when_present() ->
 
     result = check_structure(structure, specification)
 
-    assert [item.code for item in result.diagnostics] == [
-        "structure.element.missing"
-    ]
+    assert [item.code for item in result.diagnostics] == ["structure.element.missing"]
     assert "API.CONTRACTS" in result.diagnostics[0].message
 
 
@@ -1050,19 +1098,26 @@ def test_logical_structure_elements_can_share_a_parent_when_kinds_differ() -> No
     result = check_structure(structure, specification)
 
     assert result.is_valid
-    assert [(item.logical_element.logical_name, item.actual_path) for item in result.bindings] == [
+    assert [
+        (item.logical_element.logical_name, item.actual_path)
+        for item in result.bindings
+    ] == [
         ("package", ("users",)),
         ("package", ("billing",)),
         ("module", ("config",)),
     ]
 
 
-def test_structure_specification_rejects_two_logical_elements_of_the_same_kind_at_one_parent() -> None:
+def test_structure_specification_rejects_two_logical_elements_of_the_same_kind_at_one_parent() -> (
+    None
+):
     from shikumi import LogicalStructureElement, StructureFragment
 
     package_rule = StructureFragment([StructureElement((), StructuralKind.PACKAGE)])
 
-    with pytest.raises(ValueError, match="at most one logical element per structural kind"):
+    with pytest.raises(
+        ValueError, match="at most one logical element per structural kind"
+    ):
         StructureSpecification(
             [StructureElement((), StructuralKind.PACKAGE)],
             logical_elements=(
@@ -1118,7 +1173,10 @@ def test_recursive_structure_fragment_reapplies_itself_to_any_observed_depth() -
     result = check_structure(structure, specification)
 
     assert result.is_valid
-    assert [(item.logical_element.logical_name, item.actual_path) for item in result.bindings] == [
+    assert [
+        (item.logical_element.logical_name, item.actual_path)
+        for item in result.bindings
+    ] == [
         ("package", ("src", "users")),
         ("package", ("src", "users", "models")),
         ("module", ("src", "users", "models", "account")),
@@ -1238,7 +1296,9 @@ def test_structure_group_is_reused_when_its_fragment_is_mounted() -> None:
     assert [item.code for item in result.diagnostics] == ["structure.group.minimum"]
 
 
-def test_placement_can_disambiguate_kind_specific_logical_rules_from_remaining_structure() -> None:
+def test_placement_can_disambiguate_kind_specific_logical_rules_from_remaining_structure() -> (
+    None
+):
     from shikumi import LogicalStructureElement, StructureFragment, check_structure
 
     module_rule = StructureFragment([StructureElement((), StructuralKind.MODULE)])
@@ -1268,7 +1328,10 @@ def test_placement_can_disambiguate_kind_specific_logical_rules_from_remaining_s
     result = check_structure(standalone_module, specification)
 
     assert result.is_valid
-    assert [(item.logical_element.logical_name, item.actual_path) for item in result.bindings] == [
+    assert [
+        (item.logical_element.logical_name, item.actual_path)
+        for item in result.bindings
+    ] == [
         ("package", ("src", "users")),
         ("module", ("src", "users", "models")),
     ]

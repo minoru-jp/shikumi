@@ -36,8 +36,6 @@ related: [Core Semantics](../specification/core.md)
 
 ## Shikumi
 
-        
-
 ### `Shikumi`
 
 ```python

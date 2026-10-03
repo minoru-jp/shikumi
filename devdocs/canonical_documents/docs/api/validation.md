@@ -36,8 +36,6 @@ related: [Validation Semantics](../specification/validation.md)
 
 ## 検証
 
-        
-
 ### `DiagnosticSeverity`
 
 ```python

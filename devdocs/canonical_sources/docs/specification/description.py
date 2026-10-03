@@ -1,13 +1,23 @@
 """Description and runtime information specification."""
 
-from shikumi_devdoc.fields.specification import MUST, MUST_NOT, MAY, detail, level, related
+from shikumi_devdoc.fields.specification import (
+    MAY,
+    MUST,
+    MUST_NOT,
+    detail,
+    level,
+    related,
+)
 from shikumi_devdoc.norms.common import canonical_source, summary
 from shikumi_devdoc.norms.document import title
+
 from devdocs.canonical_sources.docs.specification.core import SPECIFICATION_PART as CORE
 
 
 @summary("情報接続、記述器使用、記述方法の責務境界。")
-@canonical_source("Description Semantics", filename="description.md", order=10, heading="identity")
+@canonical_source(
+    "Description Semantics", filename="description.md", order=10, heading="identity"
+)
 class SPECIFICATION_PART:
     """記述を runtime semantic state として成立させる契約。"""
 

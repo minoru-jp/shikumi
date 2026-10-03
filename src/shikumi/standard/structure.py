@@ -30,7 +30,8 @@ class PackageTreeStructure(Structure):
     identity.
     """
 
-    __slots__ = ("_python",)
+    __slots__: tuple[str, ...] = ("_python",)
+    _python: PythonStructure
 
     def __init__(self) -> None:
         self._python = PythonStructure()

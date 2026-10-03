@@ -19,9 +19,7 @@ def test_standard_information_rule_checks_cardinality() -> None:
         ).validate(Page)
 
         assert not result.is_valid
-        assert [item.code for item in result.diagnostics] == [
-            "information.cardinality"
-        ]
+        assert [item.code for item in result.diagnostics] == ["information.cardinality"]
     finally:
         clear_information(Page)
 
@@ -40,8 +38,6 @@ def test_standard_information_rule_checks_value_type_at_validation_time() -> Non
         ).validate(Page)
 
         assert not result.is_valid
-        assert [item.code for item in result.diagnostics] == [
-            "information.value_type"
-        ]
+        assert [item.code for item in result.diagnostics] == ["information.value_type"]
     finally:
         clear_information(Page)

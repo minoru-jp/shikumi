@@ -6,6 +6,20 @@ Records the major changes in each public release of Shikumi.
 
 Changes planned for the next public release.
 
+## 0.2.3 - 2026-10-03
+
+Internal quality-improvement release establishing static-analysis and CI quality gates.
+
+### Internal
+
+Added Ruff and basedpyright as development-time and CI quality gates, and brought the existing codebase to a clean state under both checks. Public API and CLI contracts are unchanged.
+
+- Added regression coverage for CLI JSON `diagnostic_counts` so the typed payload schema and emitted payload keys remain synchronized with `DiagnosticSeverity`.
+- Changed ordinary CI and the release workflow to share the same reusable quality and test checks, so a release-tag commit must pass Ruff, basedpyright, canonical-document drift, and the Python 3.11 through 3.14 test suite before build and publish can proceed.
+- Migrated the `tests/typing` consumer typing contract from a mypy unused-ignore assumption to a dedicated basedpyright configuration with rule-specific `pyright: ignore` comments, and added it to both ordinary CI and release checks.
+- Added Ruff formatting to the development and CI quality gates and normalized formatter-owned implementation, test, and canonical-source files. Generated canonical and published documents remain governed by the canonical-source workflow and are excluded from direct formatter edits.
+- Centralized the `shikumi-devdoc` version constraint in `[dependency-groups].docs`; the test dependency group and CI now reuse that dependency group instead of duplicating the version constraint.
+
 ## 0.2.2 - 2026-09-29
 
 Improved public links in the README and package metadata so documentation can be reached correctly from PyPI.

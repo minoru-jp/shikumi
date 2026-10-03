@@ -1,13 +1,16 @@
 """Realization semantics specification."""
 
-from shikumi_devdoc.fields.specification import MUST, MUST_NOT, MAY, detail, level, related
+from shikumi_devdoc.fields.specification import MAY, MUST, level, related
 from shikumi_devdoc.norms.common import canonical_source, summary
 from shikumi_devdoc.norms.document import title
+
 from devdocs.canonical_sources.docs.specification.core import SPECIFICATION_PART as CORE
 
 
 @summary("SemanticView を成果物へ変換する Realizer の独立性と check 契約。")
-@canonical_source("Realization Semantics", filename="realization.md", order=40, heading="identity")
+@canonical_source(
+    "Realization Semantics", filename="realization.md", order=40, heading="identity"
+)
 class SPECIFICATION_PART:
     """Realizer と realization check の意味上の契約。"""
 

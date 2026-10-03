@@ -36,8 +36,6 @@ related: [Public API Boundary](../specification/public-api.md)
 
 ## 例外
 
-        
-
 ### `ShikumiError`
 
 Shikumi が定義する例外の基底。

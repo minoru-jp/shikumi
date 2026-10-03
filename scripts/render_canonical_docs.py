@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import argparse
 import json
-from pathlib import Path
 import shutil
 import sys
 import tempfile
 import tomllib
+from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
@@ -17,45 +17,179 @@ for path in (ROOT, SRC):
 
 from shikumi_devdoc.cli import main as devdoc_main
 
-
 CANONICAL_DOCUMENTS = ROOT / "devdocs" / "canonical_documents"
 NOTICE_PATH = ROOT / "devdocs" / "config" / "notice.toml"
 
 # kind, canonical source module, output directory/file, expected relative output
 DOCUMENT_ARTIFACTS: tuple[tuple[str, str, Path, Path], ...] = (
     ("document", "devdocs.canonical_sources.readme", Path("."), Path("README.md")),
-    ("document", "devdocs.canonical_sources.changelog", Path("."), Path("CHANGELOG.md")),
+    (
+        "document",
+        "devdocs.canonical_sources.changelog",
+        Path("."),
+        Path("CHANGELOG.md"),
+    ),
     ("document", "devdocs.canonical_sources.status", Path("."), Path("STATUS.md")),
-    ("glossary", "devdocs.canonical_sources.docs.vocabulary", Path("docs/glossary.md"), Path("docs/glossary.md")),
-    ("document", "devdocs.canonical_sources.docs.guides.getting_started", Path("docs/guides"), Path("docs/guides/getting-started.md")),
-    ("document", "devdocs.canonical_sources.docs.guides.descriptor_authoring", Path("docs/guides"), Path("docs/guides/descriptor-authoring.md")),
-    ("document", "devdocs.canonical_sources.docs.guides.project_layout", Path("docs/guides"), Path("docs/guides/project-layout.md")),
-    ("document", "devdocs.canonical_sources.devdocs.readme", Path("devdocs"), Path("devdocs/README.md")),
-    ("document", "devdocs.canonical_sources.examples.structure_showcase.canonical", Path("examples/structure_showcase"), Path("examples/structure_showcase/README.md")),
-    ("document", "devdocs.canonical_sources.docs.api.information", Path("docs/api"), Path("docs/api/information.md")),
-    ("document", "devdocs.canonical_sources.docs.api.descriptors", Path("docs/api"), Path("docs/api/descriptors.md")),
-    ("document", "devdocs.canonical_sources.docs.api.structure", Path("docs/api"), Path("docs/api/structure.md")),
-    ("document", "devdocs.canonical_sources.docs.api.semantic_view", Path("docs/api"), Path("docs/api/semantic-view.md")),
-    ("document", "devdocs.canonical_sources.docs.api.shikumi", Path("docs/api"), Path("docs/api/shikumi.md")),
-    ("document", "devdocs.canonical_sources.docs.api.validation", Path("docs/api"), Path("docs/api/validation.md")),
-    ("document", "devdocs.canonical_sources.docs.api.realization", Path("docs/api"), Path("docs/api/realization.md")),
-    ("document", "devdocs.canonical_sources.docs.api.standard", Path("docs/api"), Path("docs/api/standard.md")),
-    ("document", "devdocs.canonical_sources.docs.api.errors", Path("docs/api"), Path("docs/api/errors.md")),
-    ("document", "devdocs.canonical_sources.docs.api.cli", Path("docs/api"), Path("docs/api/cli.md")),
-    ("document", "devdocs.canonical_sources.docs.specification.core", Path("docs/specification"), Path("docs/specification/core.md")),
-    ("document", "devdocs.canonical_sources.docs.specification.description", Path("docs/specification"), Path("docs/specification/description.md")),
-    ("document", "devdocs.canonical_sources.docs.specification.structure", Path("docs/specification"), Path("docs/specification/structure.md")),
-    ("document", "devdocs.canonical_sources.docs.specification.validation", Path("docs/specification"), Path("docs/specification/validation.md")),
-    ("document", "devdocs.canonical_sources.docs.specification.realization", Path("docs/specification"), Path("docs/specification/realization.md")),
-    ("document", "devdocs.canonical_sources.docs.specification.public_api", Path("docs/specification"), Path("docs/specification/public-api.md")),
-    ("document", "devdocs.canonical_sources.docs.specification.cli", Path("docs/specification"), Path("docs/specification/cli.md")),
+    (
+        "glossary",
+        "devdocs.canonical_sources.docs.vocabulary",
+        Path("docs/glossary.md"),
+        Path("docs/glossary.md"),
+    ),
+    (
+        "document",
+        "devdocs.canonical_sources.docs.guides.getting_started",
+        Path("docs/guides"),
+        Path("docs/guides/getting-started.md"),
+    ),
+    (
+        "document",
+        "devdocs.canonical_sources.docs.guides.descriptor_authoring",
+        Path("docs/guides"),
+        Path("docs/guides/descriptor-authoring.md"),
+    ),
+    (
+        "document",
+        "devdocs.canonical_sources.docs.guides.project_layout",
+        Path("docs/guides"),
+        Path("docs/guides/project-layout.md"),
+    ),
+    (
+        "document",
+        "devdocs.canonical_sources.devdocs.readme",
+        Path("devdocs"),
+        Path("devdocs/README.md"),
+    ),
+    (
+        "document",
+        "devdocs.canonical_sources.examples.structure_showcase.canonical",
+        Path("examples/structure_showcase"),
+        Path("examples/structure_showcase/README.md"),
+    ),
+    (
+        "document",
+        "devdocs.canonical_sources.docs.api.information",
+        Path("docs/api"),
+        Path("docs/api/information.md"),
+    ),
+    (
+        "document",
+        "devdocs.canonical_sources.docs.api.descriptors",
+        Path("docs/api"),
+        Path("docs/api/descriptors.md"),
+    ),
+    (
+        "document",
+        "devdocs.canonical_sources.docs.api.structure",
+        Path("docs/api"),
+        Path("docs/api/structure.md"),
+    ),
+    (
+        "document",
+        "devdocs.canonical_sources.docs.api.semantic_view",
+        Path("docs/api"),
+        Path("docs/api/semantic-view.md"),
+    ),
+    (
+        "document",
+        "devdocs.canonical_sources.docs.api.shikumi",
+        Path("docs/api"),
+        Path("docs/api/shikumi.md"),
+    ),
+    (
+        "document",
+        "devdocs.canonical_sources.docs.api.validation",
+        Path("docs/api"),
+        Path("docs/api/validation.md"),
+    ),
+    (
+        "document",
+        "devdocs.canonical_sources.docs.api.realization",
+        Path("docs/api"),
+        Path("docs/api/realization.md"),
+    ),
+    (
+        "document",
+        "devdocs.canonical_sources.docs.api.standard",
+        Path("docs/api"),
+        Path("docs/api/standard.md"),
+    ),
+    (
+        "document",
+        "devdocs.canonical_sources.docs.api.errors",
+        Path("docs/api"),
+        Path("docs/api/errors.md"),
+    ),
+    (
+        "document",
+        "devdocs.canonical_sources.docs.api.cli",
+        Path("docs/api"),
+        Path("docs/api/cli.md"),
+    ),
+    (
+        "document",
+        "devdocs.canonical_sources.docs.specification.core",
+        Path("docs/specification"),
+        Path("docs/specification/core.md"),
+    ),
+    (
+        "document",
+        "devdocs.canonical_sources.docs.specification.description",
+        Path("docs/specification"),
+        Path("docs/specification/description.md"),
+    ),
+    (
+        "document",
+        "devdocs.canonical_sources.docs.specification.structure",
+        Path("docs/specification"),
+        Path("docs/specification/structure.md"),
+    ),
+    (
+        "document",
+        "devdocs.canonical_sources.docs.specification.validation",
+        Path("docs/specification"),
+        Path("docs/specification/validation.md"),
+    ),
+    (
+        "document",
+        "devdocs.canonical_sources.docs.specification.realization",
+        Path("docs/specification"),
+        Path("docs/specification/realization.md"),
+    ),
+    (
+        "document",
+        "devdocs.canonical_sources.docs.specification.public_api",
+        Path("docs/specification"),
+        Path("docs/specification/public-api.md"),
+    ),
+    (
+        "document",
+        "devdocs.canonical_sources.docs.specification.cli",
+        Path("docs/specification"),
+        Path("docs/specification/cli.md"),
+    ),
 )
 
 # canonical source package, output directory, expected relative output, index title
 INDEX_ARTIFACTS: tuple[tuple[str, Path, Path, str], ...] = (
-    ("devdocs.canonical_sources.docs.guides", Path("docs/guides"), Path("docs/guides/INDEX.md"), "Shikumi Guides"),
-    ("devdocs.canonical_sources.docs.api", Path("docs/api"), Path("docs/api/INDEX.md"), "Shikumi API Reference"),
-    ("devdocs.canonical_sources.docs.specification", Path("docs/specification"), Path("docs/specification/INDEX.md"), "Shikumi Specification"),
+    (
+        "devdocs.canonical_sources.docs.guides",
+        Path("docs/guides"),
+        Path("docs/guides/INDEX.md"),
+        "Shikumi Guides",
+    ),
+    (
+        "devdocs.canonical_sources.docs.api",
+        Path("docs/api"),
+        Path("docs/api/INDEX.md"),
+        "Shikumi API Reference",
+    ),
+    (
+        "devdocs.canonical_sources.docs.specification",
+        Path("docs/specification"),
+        Path("docs/specification/INDEX.md"),
+        "Shikumi Specification",
+    ),
 )
 
 
@@ -105,7 +239,9 @@ def _render_all(output_root: Path) -> None:
         _run(_base_render_args(kind, module, output_root / relative_output, context))
 
     for module, relative_output, _, index_title in INDEX_ARTIFACTS:
-        argv = _base_render_args("index", module, output_root / relative_output, context)
+        argv = _base_render_args(
+            "index", module, output_root / relative_output, context
+        )
         argv.extend(["--index-title", index_title])
         _run(argv)
 

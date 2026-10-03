@@ -15,7 +15,7 @@ from shikumi import (
 
 def _defined_class(source: str, **names: object) -> type[object]:
     namespace: dict[str, object] = {"__name__": "tests.description", **names}
-    exec(compile(source, "<description-test>", "exec"), namespace)
+    exec(compile(source, "<description-test>", "exec"), namespace)  # noqa: S102 - trusted in-test source is executed intentionally
     return namespace["Page"]  # type: ignore[return-value]
 
 
@@ -50,7 +50,9 @@ def test_class_binding_connects_after_class_creation() -> None:
         clear_descriptor_uses(Page)
 
 
-def test_class_binding_supports_repeated_at_equals_without_interpreting_values() -> None:
+def test_class_binding_supports_repeated_at_equals_without_interpreting_values() -> (
+    None
+):
     payloads: list[object] = []
 
     class PayloadDescriptions:

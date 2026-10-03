@@ -2,15 +2,14 @@
 
 from __future__ import annotations
 
-import argparse
 import importlib
 from types import ModuleType
-from typing import Any
+from typing import Any, cast
 
 from ..model import Shikumi
 from ..realization import Realizer
 from ..structure import StructureSpecification
-from .types import CLIError, StructureSelection
+from .types import CLIArguments, CLIError, StructureSelection
 
 
 def load_reference(reference: str, *, require_object: bool) -> object:
@@ -23,7 +22,9 @@ def load_reference(reference: str, *, require_object: bool) -> object:
             f"Python reference must name an object with 'module:object': {reference!r}",
         )
     if separator and not object_path:
-        raise CLIError("reference_error", f"missing object name in reference: {reference!r}")
+        raise CLIError(
+            "reference_error", f"missing object name in reference: {reference!r}"
+        )
 
     try:
         value: object = importlib.import_module(module_name)
@@ -38,7 +39,7 @@ def load_reference(reference: str, *, require_object: bool) -> object:
 
     for name in object_path.split("."):
         try:
-            value = getattr(value, name)
+            value = cast(object, getattr(value, name))
         except AttributeError as exc:
             raise CLIError(
                 "reference_error",
@@ -64,7 +65,7 @@ def load_realizer(reference: str) -> Realizer[Any]:
             "type_error",
             f"{reference!r} does not resolve to a Realizer instance",
         )
-    return value
+    return cast(Realizer[Any], value)
 
 
 def load_structure_specification(reference: str) -> StructureSpecification:
@@ -96,7 +97,7 @@ def is_standalone_module(subject: object) -> bool:
 
 
 def select_structure(
-    args: argparse.Namespace,
+    args: CLIArguments,
     shikumi: Shikumi,
 ) -> StructureSelection | None:
     if args.structure_spec is not None:

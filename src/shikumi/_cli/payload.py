@@ -3,12 +3,24 @@
 from __future__ import annotations
 
 from types import ModuleType
+from typing import cast
 
 from ..realization import RealizationCheck
 from ..structure import StructureSpecification
 from ..validation import Diagnostic, DiagnosticSeverity, ValidationResult
 from ..view import SemanticView
-from .types import ArtifactWrite, CLIError, StructureSelection
+from .types import (
+    ArtifactWrite,
+    CLIError,
+    DiagnosticCountsPayload,
+    DiagnosticPayload,
+    ErrorPayload,
+    RealizabilityPayload,
+    RealizationPayload,
+    StructurePayload,
+    StructureSelection,
+    ValidationPayload,
+)
 
 
 def _subject_name(subject: object) -> str:
@@ -27,8 +39,8 @@ def _subject_name(subject: object) -> str:
 def diagnostic_payload(
     view: SemanticView,
     diagnostics_source: tuple[Diagnostic, ...],
-) -> list[dict[str, object]]:
-    diagnostics: list[dict[str, object]] = []
+) -> list[DiagnosticPayload]:
+    diagnostics: list[DiagnosticPayload] = []
     for diagnostic in diagnostics_source:
         subject = diagnostic.subject
         path: str | None = None
@@ -49,11 +61,12 @@ def diagnostic_payload(
     return diagnostics
 
 
-def diagnostic_counts(diagnostics: tuple[Diagnostic, ...]) -> dict[str, int]:
-    return {
+def diagnostic_counts(diagnostics: tuple[Diagnostic, ...]) -> DiagnosticCountsPayload:
+    counts = {
         severity.value: sum(1 for item in diagnostics if item.severity is severity)
         for severity in DiagnosticSeverity
     }
+    return cast(DiagnosticCountsPayload, cast(object, counts))
 
 
 def validation_payload(
@@ -64,8 +77,8 @@ def validation_payload(
     placement_reference: str | None,
     structure: StructureSelection | None,
     realization: tuple[str, RealizationCheck] | None,
-) -> dict[str, object]:
-    realization_payload: dict[str, object] | None = None
+) -> ValidationPayload:
+    realization_payload: RealizabilityPayload | None = None
     if realization is not None:
         realizer_reference, check = realization
         realization_payload = {
@@ -75,7 +88,7 @@ def validation_payload(
             "diagnostics": diagnostic_payload(check.view, check.diagnostics),
         }
 
-    structure_payload: dict[str, object] | None = None
+    structure_payload: StructurePayload | None = None
     if structure is not None:
         assert result.structure_check is not None
         structure_payload = {
@@ -112,7 +125,7 @@ def realization_payload(
     placement_reference: str | None,
     realizer_reference: str,
     write: ArtifactWrite,
-) -> dict[str, object]:
+) -> RealizationPayload:
     return {
         "format_version": 1,
         "command": "realize",
@@ -128,7 +141,7 @@ def realization_payload(
     }
 
 
-def error_payload(command: str | None, error: CLIError) -> dict[str, object]:
+def error_payload(command: str | None, error: CLIError) -> ErrorPayload:
     return {
         "format_version": 1,
         "command": command,

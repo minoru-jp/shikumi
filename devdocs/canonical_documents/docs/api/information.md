@@ -36,8 +36,6 @@ related: [Description Semantics](../specification/description.md)
 
 ## 情報
 
-        
-
 ### `Cardinality`
 
 ```python

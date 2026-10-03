@@ -7,7 +7,6 @@ from typing import assert_type
 from shikumi import InformationType
 from shikumi.standard import assignment, decorator
 
-
 Title = InformationType("title", str)
 
 title = assignment(Title)
@@ -19,14 +18,15 @@ class Page:
     title @= "Details"
 
 
-# These ignores are intentionally part of the contract. Under ``--strict``,
-# mypy's unused-ignore check makes this file fail if the writer ever stops
-# rejecting values outside the InformationType's type parameter.
-title.__imatmul__(123)  # type: ignore
+# These ignores are intentionally part of the contract. With
+# reportUnnecessaryTypeIgnoreComment enabled in this directory's basedpyright
+# config, this file fails if the writer ever stops rejecting values outside the
+# InformationType's type parameter.
+title.__imatmul__(123)  # pyright: ignore[reportArgumentType]
 
 
 class InvalidPage:
-    title @= 123  # type: ignore
+    title @= 123  # pyright: ignore[reportOperatorIssue]
 
 
 title_decorator = decorator(Title)
@@ -38,4 +38,4 @@ class DecoratedPage:
     pass
 
 
-title_decorator(123)  # type: ignore
+title_decorator(123)  # pyright: ignore[reportArgumentType]

@@ -54,7 +54,7 @@ class Shikumi:
     @staticmethod
     def _validate_structure(structure: Structure) -> None:
         if not isinstance(structure, Structure):
-            raise TypeError("structure must be a Structure")
+            raise TypeError("structure must be a Structure")  # pyright: ignore[reportUnreachable]
 
     @staticmethod
     def _validate_information_types(
@@ -155,7 +155,9 @@ class Shikumi:
             and not hasattr(focus.subject, "__path__")
             and focus.placement is None
         ):
-            raise ValueError("standalone module validation requires an explicit placement")
+            raise ValueError(
+                "standalone module validation requires an explicit placement"
+            )
 
         root_view = self.view(focus)
         diagnostics: list[Diagnostic] = []

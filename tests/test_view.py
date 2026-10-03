@@ -17,7 +17,7 @@ from shikumi import (
 def test_module_view_exposes_focus_entities_and_information() -> None:
     title = InformationType("title", str)
     module = types.ModuleType("docs.auth")
-    exec(
+    exec(  # noqa: S102 - trusted in-test source is executed intentionally
         compile(
             "class Login: pass\nclass RefreshToken: pass",
             "<docs.auth>",
@@ -70,7 +70,7 @@ def test_class_information_does_not_leak_through_inheritance() -> None:
 
 def test_view_item_lookup_is_identity_based() -> None:
     module = types.ModuleType("docs.identity")
-    exec(compile("class Page: pass", "<docs.identity>", "exec"), module.__dict__)
+    exec(compile("class Page: pass", "<docs.identity>", "exec"), module.__dict__)  # noqa: S102 - trusted in-test source is executed intentionally
 
     view = Shikumi().view(module)
 
@@ -89,7 +89,10 @@ def test_shikumi_rejects_duplicate_information_type_objects() -> None:
 def test_semantic_view_subview_reuses_already_interpreted_records() -> None:
     title = InformationType("title", str)
     module = types.ModuleType("docs.subview")
-    exec(compile("class Outer:\n    class Inner: pass", "<docs.subview>", "exec"), module.__dict__)
+    exec(  # noqa: S102 - trusted in-test source is executed intentionally
+        compile("class Outer:\n    class Inner: pass", "<docs.subview>", "exec"),
+        module.__dict__,
+    )
 
     try:
         attach_information(module.Outer, title, "Outer")
@@ -106,8 +109,14 @@ def test_semantic_view_subview_reuses_already_interpreted_records() -> None:
             module.Outer,
             module.Outer.Inner,
         )
-        assert subview.item(module.Outer).information is view.item(module.Outer).information
-        assert subview.item(module.Outer.Inner).information is view.item(module.Outer.Inner).information
+        assert (
+            subview.item(module.Outer).information
+            is view.item(module.Outer).information
+        )
+        assert (
+            subview.item(module.Outer.Inner).information
+            is view.item(module.Outer.Inner).information
+        )
     finally:
         clear_information(module.Outer)
         clear_information(module.Outer.Inner)

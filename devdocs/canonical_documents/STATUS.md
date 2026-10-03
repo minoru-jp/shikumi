@@ -22,7 +22,7 @@ Shikumi の現在の開発段階、互換性方針、および 1.0 へ向けた�
 
 ## 現在のステータス
 
-現在の公開バージョン系列は `0.2.x`、開発段階は **Beta** です。
+現在の公開バージョンは `0.2.3`、公開バージョン系列は `0.2.x`、開発段階は **Beta** です。
 
 0.2.0 では文書体系の再構成と構造規定 API の拡張を行い、今後の実運用で検証する基盤を確定しました。Beta 期間は API を作り直すための期間ではなく、現在の設計を依存プロジェクトと実利用の中で検証し、必要な改善を互換性を維持しながら行う期間です。
 
@@ -56,6 +56,6 @@ Shikumi は PyPI と公開 GitHub リポジトリ `https://github.com/minoru-jp/
 
 トップレベル README の主要文書、公式作例、LICENSE への参照には公開 GitHub repository の絶対 URL を使用し、GitHub 上だけでなく PyPI の README 表示からも同じ公開文書へ辿れるようにしています。package metadata でも Homepage / Repository / Documentation / Issues URL を公開します。
 
-GitHub Actions の hosted CI は `main` への push と pull request で実行し、Python 3.11 から 3.14 のテスト、canonical document の drift 検査、wheel / sdist の build と distribution 内容検査を行います。
+GitHub Actions の hosted CI は `main` への push と pull request で実行します。quality job では Ruff と basedpyright による品質検査を行い、Ruff は lint と format check が clean、本体コードの basedpyright は error / warning が 0 の状態を品質ゲートとします。さらに `tests/typing` の consumer typing contract を専用の basedpyright 設定で検証し、公開型 API が意図した値を受理・拒否する契約も固定します。あわせて Python 3.11 から 3.14 のテスト、canonical document の drift 検査、wheel / sdist の build と distribution 内容検査を行います。
 
-PyPI への公開は通常の push とは分離します。`.github/workflows/release.yml` は GitHub Release が publish された場合だけ動作し、release tag と `pyproject.toml` の version の一致を確認してから distribution を build し、PyPI Trusted Publishing で公開します。GitHub の `pypi` environment と PyPI 側の Trusted Publisher は対応付け済みです。
+PyPI への公開は通常の push とは分離します。`.github/workflows/release.yml` は GitHub Release が publish された場合だけ動作し、通常 CI と共通の reusable checks で Ruff、本体コードと consumer typing contract の basedpyright、canonical document drift、Python 3.11 から 3.14 の test suite を release tag の commit に対して再実行します。これらが成功し、release tag と `pyproject.toml` の version の一致も確認できた場合だけ distribution を build し、PyPI Trusted Publishing で公開します。GitHub の `pypi` environment と PyPI 側の Trusted Publisher は対応付け済みです。

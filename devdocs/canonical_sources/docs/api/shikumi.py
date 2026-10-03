@@ -1,33 +1,44 @@
 """Canonical Japanese API reference source for Shikumi API."""
 
-from devdocs.canonical_sources.docs.vocabulary import TERMS
 from shikumi_devdoc.fields.api_reference import (
-    NAMESPACE, OPERATION, OTHER, TYPE, VALUE,
-    input, kind, name, output, related,
+    OPERATION,
+    TYPE,
+    input,
+    kind,
+    name,
+    output,
+    related,
 )
 from shikumi_devdoc.norms.common import canonical_source, merge, summary
 from shikumi_devdoc.norms.document import test_target_field, title
-from devdocs.canonical_sources.docs.specification.core import SPECIFICATION_PART as CORE_SPEC
-from devdocs.canonical_sources.docs.specification.validation import SPECIFICATION_PART as VALIDATION_SPEC
 
+from devdocs.canonical_sources.docs.specification.core import (
+    SPECIFICATION_PART as CORE_SPEC,
+)
+from devdocs.canonical_sources.docs.specification.validation import (
+    SPECIFICATION_PART as VALIDATION_SPEC,
+)
+from devdocs.canonical_sources.docs.vocabulary import TERMS
 
 composition_example = test_target_field("composition example")
-@summary('Shikumi 本体の構成・解釈・検証 API。')
-@canonical_source('Shikumi API', filename='shikumi.md', order=40, heading="title")
+
+
+@summary("Shikumi 本体の構成・解釈・検証 API。")
+@canonical_source("Shikumi API", filename="shikumi.md", order=40, heading="title")
 class API_REFERENCE_PART:
     """Shikumi インスタンスの構成、view、structure derivation、validation を扱う。"""
 
     related @= CORE_SPEC
 
     class TITLE_49:
-        r'''
-        '''
+        r""  # noqa: D419 - heading-only canonical node
+
         title @= "{{TERM_1}}"
 
         merge @= TERMS.TERM_1
 
         class TITLE_50:
-            r'''
+            r"""
             ```python
             {{TERM_1}}(
                 *,
@@ -45,13 +56,13 @@ class API_REFERENCE_PART:
             `information_types`、`validators`、`descriptor_rules` の各要素は、それぞれ `InformationType`、`ValidationRule`、`DescriptorUseRule` でなければならない。同一のオブジェクトを同じ {{TERM_1}} に重複登録してはならない。種類が異なる構成要素は constructor で `TypeError` とし、重複は `ValueError` とする。
 
             constructor が保証するのは、構成要素の種類と局所的な登録{{TERM_24}}までである。`Structure.resolve()` を試行したり、{{TERM_22}}同士の意味的整合性、{{TERM_17}}が実際の{{TERM_7}}で到達可能かといった意味的妥当性を事前評価したりはしない。これらは各構成要素の実行時の責務であり、独自拡張の表現力を constructor 検証のために狭めない。
-            '''
-            title @= '`Shikumi`'
+            """
+
+            title @= "`Shikumi`"
             related @= CORE_SPEC.CORE_007
 
-            name @= 'Shikumi'
+            name @= "Shikumi"
             kind @= TYPE
-
 
             merge @= TERMS.TERM_1
             merge @= TERMS.TERM_7
@@ -62,24 +73,24 @@ class API_REFERENCE_PART:
             merge @= TERMS.TERM_24
 
         class TITLE_51:
-            r'''
+            r"""
             ```python
             def recognizes(self, information_type: InformationType[Any]) -> bool
             ```
 
             その{{TERM_12}}を identity によって認識するかを返す。
-            '''
-            title @= '`recognizes()`'
-            name @= 'recognizes()'
-            kind @= OPERATION
-            input @= 'information_type: InformationType[Any]'
-            output @= 'bool'
+            """
 
+            title @= "`recognizes()`"
+            name @= "recognizes()"
+            kind @= OPERATION
+            input @= "information_type: InformationType[Any]"
+            output @= "bool"
 
             merge @= TERMS.TERM_12
 
         class TITLE_52:
-            r'''
+            r"""
             ```python
             def view(
                 self,
@@ -96,8 +107,9 @@ class API_REFERENCE_PART:
             ```python
             {{composition_example}}
             ```
-            '''
-            title @= '`view()`'
+            """
+
+            title @= "`view()`"
             composition_example @= r"""
             from shikumi import InformationType, Shikumi, attach_information
 
@@ -122,12 +134,11 @@ class API_REFERENCE_PART:
             related @= CORE_SPEC.CORE_004
             related @= CORE_SPEC.CORE_008
 
-            name @= 'view()'
+            name @= "view()"
             kind @= OPERATION
-            input @= 'subject: object | Focus'
-            input @= 'placement: tuple[str, ...] | None = None'
-            output @= 'SemanticView'
-
+            input @= "subject: object | Focus"
+            input @= "placement: tuple[str, ...] | None = None"
+            output @= "SemanticView"
 
             merge @= TERMS.TERM_20
             merge @= TERMS.TERM_18
@@ -140,7 +151,7 @@ class API_REFERENCE_PART:
             merge @= TERMS.TERM_21
 
         class TITLE_53:
-            r'''
+            r"""
             ```python
             def derive_structure_specification(
                 self,
@@ -151,14 +162,14 @@ class API_REFERENCE_PART:
             ```
 
             {{TERM_5}}をこの {{TERM_1}} の `Structure` で{{TERM_18}}し、その{{TERM_20}}をルートとする{{TERM_8}}を導出する。これは明示的な{{TERM_8}}を探索する method ではなく、呼び出し側が「{{TERM_5}}から導出する」ことを選択した場合に使用する。
-            '''
-            title @= '`derive_structure_specification()`'
-            name @= 'derive_structure_specification()'
-            kind @= OPERATION
-            input @= 'subject: object | Focus'
-            input @= 'placement: tuple[str, ...] | None = None'
-            output @= 'StructureSpecification'
+            """
 
+            title @= "`derive_structure_specification()`"
+            name @= "derive_structure_specification()"
+            kind @= OPERATION
+            input @= "subject: object | Focus"
+            input @= "placement: tuple[str, ...] | None = None"
+            output @= "StructureSpecification"
 
             merge @= TERMS.TERM_5
             merge @= TERMS.TERM_1
@@ -167,7 +178,7 @@ class API_REFERENCE_PART:
             merge @= TERMS.TERM_8
 
         class TITLE_54:
-            r'''
+            r"""
             ```python
             def validate(
                 self,
@@ -187,20 +198,20 @@ class API_REFERENCE_PART:
             {{TERM_8}}の照合では、{{TERM_20}}に配置が指定されている場合、その位置以下の部分{{TERM_7}}だけを厳密に照合する。これにより、module 単体の{{TERM_21}}では外側の兄弟 module 等を観測したかのようには扱わない。
 
             ---
-            '''
-            title @= '`validate()`'
+            """
+
+            title @= "`validate()`"
             related @= CORE_SPEC.CORE_005
             related @= VALIDATION_SPEC.VAL_005
 
             related @= CORE_SPEC.CORE_008
 
-            name @= 'validate()'
+            name @= "validate()"
             kind @= OPERATION
-            input @= 'subject: object | Focus'
-            input @= 'placement: tuple[str, ...] | None = None'
-            input @= 'structure_specification: StructureSpecification | None = None'
-            output @= 'ValidationResult'
-
+            input @= "subject: object | Focus"
+            input @= "placement: tuple[str, ...] | None = None"
+            input @= "structure_specification: StructureSpecification | None = None"
+            output @= "ValidationResult"
 
             merge @= TERMS.TERM_20
             merge @= TERMS.TERM_19
@@ -211,4 +222,3 @@ class API_REFERENCE_PART:
             merge @= TERMS.TERM_13
             merge @= TERMS.TERM_16
             merge @= TERMS.TERM_18
-

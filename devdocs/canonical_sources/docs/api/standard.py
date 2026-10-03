@@ -1,24 +1,40 @@
 """Canonical Japanese API reference source for Standard API."""
 
-from devdocs.canonical_sources.docs.vocabulary import TERMS
 from shikumi_devdoc.fields.api_reference import (
-    NAMESPACE, OPERATION, TYPE,
-    input, kind, name, output, related,
+    NAMESPACE,
+    OPERATION,
+    TYPE,
+    input,
+    kind,
+    name,
+    output,
+    related,
 )
 from shikumi_devdoc.norms.common import canonical_source, merge, summary
 from shikumi_devdoc.norms.document import test_target_field, title
-from devdocs.canonical_sources.docs.specification.description import SPECIFICATION_PART as DESCRIPTION_SPEC
-from devdocs.canonical_sources.docs.specification.public_api import SPECIFICATION_PART as PUBLIC_API_SPEC
-from devdocs.canonical_sources.docs.specification.structure import SPECIFICATION_PART as STRUCTURE_SPEC
-from devdocs.canonical_sources.docs.specification.validation import SPECIFICATION_PART as VALIDATION_SPEC
 
+from devdocs.canonical_sources.docs.specification.description import (
+    SPECIFICATION_PART as DESCRIPTION_SPEC,
+)
+from devdocs.canonical_sources.docs.specification.public_api import (
+    SPECIFICATION_PART as PUBLIC_API_SPEC,
+)
+from devdocs.canonical_sources.docs.specification.structure import (
+    SPECIFICATION_PART as STRUCTURE_SPEC,
+)
+from devdocs.canonical_sources.docs.specification.validation import (
+    SPECIFICATION_PART as VALIDATION_SPEC,
+)
+from devdocs.canonical_sources.docs.vocabulary import TERMS
 
 assignment_example = test_target_field("assignment example")
 decorator_example = test_target_field("decorator example")
 docstring_example = test_target_field("docstring example")
 information_type_rule_example = test_target_field("information type rule example")
-@summary('`shikumi.standard` が提供する再利用可能な記述器、情報型、構造、検証規則。')
-@canonical_source('Standard API', filename='standard.md', order=70, heading="title")
+
+
+@summary("`shikumi.standard` が提供する再利用可能な記述器、情報型、構造、検証規則。")
+@canonical_source("Standard API", filename="standard.md", order=70, heading="title")
 class API_REFERENCE_PART:
     """Core の公開プリミティブを組み合わせた `shikumi.standard` の公開 API。"""
 
@@ -26,16 +42,17 @@ class API_REFERENCE_PART:
     related @= PUBLIC_API_SPEC.API_004
 
     class TITLE_76:
-        r'''
+        r"""
         Standard は Core の公開 API を組み合わせた再利用可能な具体機能を提供する。Standard は新しい意味モデルを導入しない。
-        '''
-        title @= '`shikumi.standard`'
+        """
 
-        name @= 'shikumi.standard'
+        title @= "`shikumi.standard`"
+
+        name @= "shikumi.standard"
         kind @= NAMESPACE
 
         class TITLE_77:
-            r'''
+            r"""
             ```python
             def assignment(information_type: InformationType[T])
             ```
@@ -46,8 +63,9 @@ class API_REFERENCE_PART:
             {{assignment_example}}
             ```
             同じ名前に対する連続した `@=` を許可する。
-            '''
-            title @= '`assignment()`'
+            """
+
+            title @= "`assignment()`"
             assignment_example @= r"""
             from shikumi import InformationType, information_of
             from shikumi.standard import assignment
@@ -62,10 +80,10 @@ class API_REFERENCE_PART:
             """
 
             related @= DESCRIPTION_SPEC.DESC_003
-            name @= 'assignment()'
+            name @= "assignment()"
             kind @= OPERATION
-            input @= 'information_type: InformationType[T]'
-            output @= 'descriptor supporting @='
+            input @= "information_type: InformationType[T]"
+            output @= "descriptor supporting @="
 
             merge @= TERMS.TERM_12
             merge @= TERMS.TERM_14
@@ -73,7 +91,7 @@ class API_REFERENCE_PART:
             merge @= TERMS.TERM_16
 
         class TITLE_78:
-            r'''
+            r"""
             ```python
             def decorator(information_type: InformationType[T])
             ```
@@ -84,8 +102,9 @@ class API_REFERENCE_PART:
             {{decorator_example}}
             ```
             語彙名そのものを IDE から追跡可能にしたい場合や、引数に独自の意味を持たせたい場合は、この便利機能ではなく通常の Python デコレータを{{TERM_3}}で定義する。
-            '''
-            title @= '`decorator()`'
+            """
+
+            title @= "`decorator()`"
             decorator_example @= r"""
             from shikumi import InformationType, information_of
             from shikumi.standard import decorator
@@ -101,10 +120,10 @@ class API_REFERENCE_PART:
             """
 
             related @= DESCRIPTION_SPEC.DESC_003
-            name @= 'decorator()'
+            name @= "decorator()"
             kind @= OPERATION
-            input @= 'information_type: InformationType[T]'
-            output @= 'value-taking decorator descriptor'
+            input @= "information_type: InformationType[T]"
+            output @= "value-taking decorator descriptor"
 
             merge @= TERMS.TERM_12
             merge @= TERMS.TERM_14
@@ -113,7 +132,7 @@ class API_REFERENCE_PART:
             merge @= TERMS.TERM_3
 
         class TITLE_79:
-            r'''
+            r"""
             ```python
             DocstringWriter(
                 information_type: InformationType[Any],
@@ -126,21 +145,22 @@ class API_REFERENCE_PART:
             明示的に適用された対象の `__doc__` を{{TERM_13}}として接続する標準{{TERM_15}}。適用時には{{TERM_16}}を記録し、docstring が存在しない場合でも「{{TERM_15}}が使用された」という事実は残る。
 
             `clean=True` の場合は Python の docstring 整形規則に従って余分なインデントを除去する。`required=True` で docstring が存在しない場合は `ValueError` を送出する。
-            '''
-            title @= '`DocstringWriter`'
+            """
+
+            title @= "`DocstringWriter`"
             related @= DESCRIPTION_SPEC.DESC_003
-            name @= 'DocstringWriter'
+            name @= "DocstringWriter"
             kind @= TYPE
-            input @= 'information_type: InformationType[Any]'
-            input @= 'clean: bool = True'
-            input @= 'required: bool = False'
+            input @= "information_type: InformationType[Any]"
+            input @= "clean: bool = True"
+            input @= "required: bool = False"
 
             merge @= TERMS.TERM_13
             merge @= TERMS.TERM_15
             merge @= TERMS.TERM_16
 
         class TITLE_79A:
-            r'''
+            r"""
             ```python
             def docstring(
                 information_type: InformationType[Any],
@@ -156,8 +176,9 @@ class API_REFERENCE_PART:
             {{docstring_example}}
             ```
             `required=False` で docstring が存在しない場合は何も接続しない。{{TERM_13}}の必須性は通常、{{TERM_22}}で表現することを推奨する。
-            '''
-            title @= '`docstring()`'
+            """
+
+            title @= "`docstring()`"
             docstring_example @= r'''
             from shikumi import information_of
             from shikumi.standard import content_type, docstring
@@ -173,18 +194,18 @@ class API_REFERENCE_PART:
             '''
 
             related @= DESCRIPTION_SPEC.DESC_003
-            name @= 'docstring()'
+            name @= "docstring()"
             kind @= OPERATION
-            input @= 'information_type: InformationType[Any]'
-            input @= 'clean: bool = True'
-            input @= 'required: bool = False'
-            output @= 'DocstringWriter'
+            input @= "information_type: InformationType[Any]"
+            input @= "clean: bool = True"
+            input @= "required: bool = False"
+            output @= "DocstringWriter"
 
             merge @= TERMS.TERM_13
             merge @= TERMS.TERM_22
 
         class TITLE_80:
-            r'''
+            r"""
             ```python
             def content_type(
                 name: str = "content",
@@ -194,18 +215,19 @@ class API_REFERENCE_PART:
             ```
 
             主要内容を表す `Cardinality.ONE` の{{TERM_12}}を生成する便利関数。`value_type` は生成される `InformationType` へそのまま渡す。
-            '''
-            title @= '`content_type()`'
-            name @= 'content_type()'
+            """
+
+            title @= "`content_type()`"
+            name @= "content_type()"
             kind @= OPERATION
             input @= 'name: str = "content"'
-            input @= 'value_type: type[Any] | tuple[type[Any], ...] = str'
-            output @= 'InformationType[Any]'
+            input @= "value_type: type[Any] | tuple[type[Any], ...] = str"
+            output @= "InformationType[Any]"
 
             merge @= TERMS.TERM_12
 
         class TITLE_81:
-            r'''
+            r"""
             ```python
             PackageTreeStructure()
             ```
@@ -215,10 +237,11 @@ class API_REFERENCE_PART:
             module または{{TERM_11}}を{{TERM_20}}とした場合は `PythonStructure` と同等の局所{{TERM_18}}を行う。各 module では、module 直下の class に加えて字句上の入れ子 class も{{TERM_11}}として{{TERM_10}}へ含める。
 
             この{{TERM_7}}は Python import の実行結果を意味状態の正とする。source を AST として解析しない。package discovery によって見つかった module は通常の import と同様に実行される。
-            '''
-            title @= '`PackageTreeStructure`'
+            """
+
+            title @= "`PackageTreeStructure`"
             related @= STRUCTURE_SPEC.STRUCT_001
-            name @= 'PackageTreeStructure'
+            name @= "PackageTreeStructure"
             kind @= TYPE
 
             merge @= TERMS.TERM_20
@@ -228,7 +251,7 @@ class API_REFERENCE_PART:
             merge @= TERMS.TERM_7
 
         class TITLE_82:
-            r'''
+            r"""
             ```python
             def information_type_rule(
                 information_type: InformationType[Any],
@@ -247,8 +270,9 @@ class API_REFERENCE_PART:
             ```python
             {{information_type_rule_example}}
             ```
-            '''
-            title @= '`information_type_rule()`'
+            """
+
+            title @= "`information_type_rule()`"
             information_type_rule_example @= r"""
             from shikumi import InformationType, Shikumi
             from shikumi.standard import assignment, information_type_rule
@@ -273,11 +297,11 @@ class API_REFERENCE_PART:
             """
 
             related @= VALIDATION_SPEC.VAL_001
-            name @= 'information_type_rule()'
+            name @= "information_type_rule()"
             kind @= OPERATION
-            input @= 'information_type: InformationType[Any]'
-            input @= 'focus: StructuralKind = StructuralKind.ENTITY'
-            output @= 'ValidationRule'
+            input @= "information_type: InformationType[Any]"
+            input @= "focus: StructuralKind = StructuralKind.ENTITY"
+            output @= "ValidationRule"
 
             merge @= TERMS.TERM_12
             merge @= TERMS.TERM_21

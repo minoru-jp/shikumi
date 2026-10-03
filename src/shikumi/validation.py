@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Callable, Iterable, Iterator
 from dataclasses import dataclass, field, replace
 from enum import Enum
-from typing import TypeAlias
+from typing import Protocol, TypeAlias
 
 from .description import DescriptorUseRule, same_descriptor
 from .structure import (
@@ -138,6 +138,26 @@ class StructureBinding:
             )
         object.__setattr__(self, "actual_path", normalized)
 
+
+class _RecursiveStructureElementLike(Protocol):
+    """Read-only contract required for recursive structure rules."""
+
+    @property
+    def parent(self) -> tuple[str, ...]: ...
+
+    @property
+    def logical_name(self) -> str: ...
+
+    @property
+    def names(self) -> tuple[str, ...] | None: ...
+
+    @property
+    def max_count(self) -> int | None: ...
+
+    @property
+    def template(self) -> StructureFragment | None: ...
+
+
 @dataclass(frozen=True, slots=True)
 class StructureCheck:
     """Result of checking a resolved structure against a structural regulation."""
@@ -237,8 +257,8 @@ def check_descriptor_uses(
 class _StructureRuleNode:
     kind: StructuralKind
     required: bool = True
-    exact_children: dict[str, "_StructureRuleNode"] = field(default_factory=dict)
-    logical_children: dict[StructuralKind, "_LogicalStructureRule"] = field(
+    exact_children: dict[str, _StructureRuleNode] = field(default_factory=dict)
+    logical_children: dict[StructuralKind, _LogicalStructureRule] = field(
         default_factory=dict
     )
     groups: tuple[StructureGroup, ...] = ()
@@ -351,7 +371,7 @@ def _attach_logical_rules(
 
 def _attach_recursive_rules(
     nodes: dict[tuple[str, ...], _StructureRuleNode],
-    recursive_elements: tuple[object, ...],
+    recursive_elements: tuple[_RecursiveStructureElementLike, ...],
     *,
     owner_fragment: StructureFragment | None,
     memo: dict[int, _StructureRuleNode],
@@ -385,9 +405,7 @@ def _append_binding(
         for binding in bindings
     ):
         return
-    bindings.append(
-        StructureBinding(logical_element=logical, actual_path=actual_path)
-    )
+    bindings.append(StructureBinding(logical_element=logical, actual_path=actual_path))
 
 
 def _resolve_rule_path(
@@ -429,7 +447,9 @@ def _resolve_rule_path(
             if len(kind_matches) == 1:
                 candidates = kind_matches
 
-        successful: list[tuple[_StructureRuleNode | None, bool, list[StructureBinding]]] = []
+        successful: list[
+            tuple[_StructureRuleNode | None, bool, list[StructureBinding]]
+        ] = []
         for logical in candidates:
             branch_bindings = list(collected)
             if not any(
@@ -464,6 +484,7 @@ def _resolve_rule_path(
         _append_binding(bindings, binding.logical_element, binding.actual_path)
     return node, below_unconstrained
 
+
 def _actual_structure_maps(
     structure: ResolvedStructure,
     root_path: tuple[str, ...],
@@ -478,7 +499,9 @@ def _actual_structure_maps(
     children_by_parent: dict[tuple[str, ...], list[tuple[str, ...]]] = {}
     for node in structure.nodes:
         if node.path[: len(root_path)] != root_path:
-            raise ValueError("resolved structure contains a node outside its focus root")
+            raise ValueError(
+                "resolved structure contains a node outside its focus root"
+            )
         relative = node.path[len(root_path) :]
         effective = placement + relative
         if effective in actual_kind_by_path:
@@ -740,10 +763,7 @@ def _match_dynamic_rule(
                     subject=actual_by_path[path],
                 )
             )
-        if (
-            logical.element.max_count is not None
-            and count > logical.element.max_count
-        ):
+        if logical.element.max_count is not None and count > logical.element.max_count:
             diagnostics.append(
                 Diagnostic(
                     f"logical structural element {logical.element.logical_name!r} "
@@ -780,10 +800,19 @@ def _check_dynamic_structure(
         placement,
         bindings,
         focus_kind=next(
-            node.kind for node in structure.nodes if node.subject is structure.focus.subject
+            node.kind
+            for node in structure.nodes
+            if node.subject is structure.focus.subject
         ),
     )
-    if placement_rule is None and not below_unconstrained:
+    if placement_rule is None:
+        if below_unconstrained:
+            return StructureCheck(
+                specification=specification,
+                placement=placement,
+                diagnostics=(),
+                bindings=tuple(bindings),
+            )
         diagnostic = Diagnostic(
             "structure placement is not defined by the specification: "
             f"{StructureSpecification.format_path(placement)}",
@@ -794,14 +823,6 @@ def _check_dynamic_structure(
             specification=specification,
             placement=placement,
             diagnostics=(diagnostic,),
-            bindings=tuple(bindings),
-        )
-
-    if below_unconstrained:
-        return StructureCheck(
-            specification=specification,
-            placement=placement,
-            diagnostics=(),
             bindings=tuple(bindings),
         )
 

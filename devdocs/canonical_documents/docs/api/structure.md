@@ -36,8 +36,6 @@ related: [Structure Semantics](../specification/structure.md)
 
 ## 構造と焦点
 
-        
-
 ### `Focus`
 
 ```python

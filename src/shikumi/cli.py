@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 from collections.abc import Sequence
+from typing import cast
 
 from ._cli.artifact import write_artifact
 from ._cli.loading import (
@@ -21,7 +22,7 @@ from ._cli.rendering import (
     render_realization_text,
     render_validation_text,
 )
-from ._cli.types import CLIError
+from ._cli.types import CLIArguments, CLIError
 from .realization import RealizationCheck
 
 
@@ -38,17 +39,17 @@ def _parser() -> argparse.ArgumentParser:
     )
     _add_common_arguments(validate_parser)
     structure_group = validate_parser.add_mutually_exclusive_group()
-    structure_group.add_argument(
+    _ = structure_group.add_argument(
         "--structure-spec",
         metavar="MODULE:OBJECT",
         help="explicit StructureSpecification published by a regulation body",
     )
-    structure_group.add_argument(
+    _ = structure_group.add_argument(
         "--structure-from",
         metavar="MODULE[:OBJECT]",
         help="derive the structural regulation from this description body",
     )
-    validate_parser.add_argument(
+    _ = validate_parser.add_argument(
         "--realizer",
         metavar="MODULE:OBJECT",
         help="also query whether this Realizer can realize the semantic view",
@@ -59,13 +60,13 @@ def _parser() -> argparse.ArgumentParser:
         help="realize a Python module, package, or object through a semantic view",
     )
     _add_common_arguments(realize_parser)
-    realize_parser.add_argument(
+    _ = realize_parser.add_argument(
         "--realizer",
         required=True,
         metavar="MODULE:OBJECT",
         help="Python reference to a Realizer instance",
     )
-    realize_parser.add_argument(
+    _ = realize_parser.add_argument(
         "--output",
         required=True,
         metavar="PATH",
@@ -76,24 +77,24 @@ def _parser() -> argparse.ArgumentParser:
 
 
 def _add_common_arguments(parser: argparse.ArgumentParser) -> None:
-    parser.add_argument(
+    _ = parser.add_argument(
         "--shikumi",
         required=True,
         metavar="MODULE:OBJECT",
         help="Python reference to a Shikumi instance",
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--body",
         required=True,
         metavar="MODULE[:OBJECT]",
         help="Python module/package or object used as the description body",
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--at",
         metavar="PLACEMENT",
         help="intended structural placement, written as a dotted path; '.' means root",
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--format",
         choices=("text", "json"),
         default="text",
@@ -105,7 +106,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     """Run the Shikumi command-line interface and return a process exit code."""
 
     parser = _parser()
-    args = parser.parse_args(argv)
+    args = cast(CLIArguments, cast(object, parser.parse_args(argv)))
     command: str = args.command
     output_format: str = args.format
 
@@ -136,8 +137,9 @@ def main(argv: Sequence[str] | None = None) -> int:
                 ) from exc
 
             realization: tuple[str, RealizationCheck] | None = None
-            if args.realizer is not None:
-                realizer = load_realizer(args.realizer)
+            realizer_reference = args.realizer
+            if realizer_reference is not None:
+                realizer = load_realizer(realizer_reference)
                 try:
                     check = realizer.check(result.view)
                 except Exception as exc:
@@ -147,9 +149,9 @@ def main(argv: Sequence[str] | None = None) -> int:
                 if not isinstance(check, RealizationCheck):
                     raise CLIError(
                         "type_error",
-                        f"{args.realizer!r}.check() did not return RealizationCheck",
+                        f"{realizer_reference!r}.check() did not return RealizationCheck",
                     )
-                realization = (args.realizer, check)
+                realization = (realizer_reference, check)
 
             payload = validation_payload(
                 result,
@@ -167,7 +169,10 @@ def main(argv: Sequence[str] | None = None) -> int:
             return 0 if bool(payload["ok"]) else 1
 
         if command == "realize":
-            realizer = load_realizer(args.realizer)
+            realizer_reference = args.realizer
+            if realizer_reference is None:
+                raise AssertionError("realize parser requires --realizer")
+            realizer = load_realizer(realizer_reference)
             try:
                 view = shikumi.view(body, placement=placement)
             except Exception as exc:
@@ -175,7 +180,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                     "interpretation_error", str(exc) or type(exc).__name__
                 ) from exc
             try:
-                artifact = realizer.realize(view)
+                artifact = cast(object, realizer.realize(view))
             except Exception as exc:
                 raise CLIError(
                     "realization_error", str(exc) or type(exc).__name__
@@ -185,7 +190,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 shikumi_reference=args.shikumi,
                 body_reference=args.body,
                 placement_reference=args.at,
-                realizer_reference=args.realizer,
+                realizer_reference=realizer_reference,
                 write=write,
             )
             emit(

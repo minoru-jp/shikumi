@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from collections.abc import Iterable
+from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
 from enum import Enum
 from types import ModuleType
-from typing import Iterator
+from typing import cast
 
 from .errors import UnsupportedFocusError
 
@@ -108,7 +108,9 @@ class ResolvedStructure:
 
             identity = id(node.subject)
             if identity in seen_subjects:
-                raise ValueError("resolved structure contains duplicate subject identity")
+                raise ValueError(
+                    "resolved structure contains duplicate subject identity"
+                )
             seen_subjects.add(identity)
 
             if node.path[: len(root.path)] != root.path:
@@ -152,7 +154,9 @@ class StructureElement:
             raise TypeError("structure element path must be a tuple of path components")
         normalized = tuple(self.path)
         if any(not isinstance(part, str) or not part for part in normalized):
-            raise ValueError("structure element path components must be non-empty strings")
+            raise ValueError(
+                "structure element path components must be non-empty strings"
+            )
         if not isinstance(self.kind, StructuralKind):
             raise TypeError("structure element kind must be a StructuralKind")
         if not isinstance(self.required, bool):
@@ -172,7 +176,9 @@ class StructureMount:
             raise TypeError("structure mount path must be a tuple of path components")
         normalized = tuple(self.path)
         if any(not isinstance(part, str) or not part for part in normalized):
-            raise ValueError("structure mount path components must be non-empty strings")
+            raise ValueError(
+                "structure mount path components must be non-empty strings"
+            )
         if not isinstance(self.fragment, StructureFragment):
             raise TypeError("structure mount fragment must be a StructureFragment")
         object.__setattr__(self, "path", normalized)
@@ -205,9 +211,13 @@ class StructureGroup:
             raise TypeError("structure group parent must be a tuple of path components")
         normalized_parent = tuple(parent)
         if any(not isinstance(part, str) or not part for part in normalized_parent):
-            raise ValueError("structure group parent components must be non-empty strings")
+            raise ValueError(
+                "structure group parent components must be non-empty strings"
+            )
         if isinstance(members, str):
-            raise TypeError("structure group members must be an iterable of names, not a string")
+            raise TypeError(
+                "structure group members must be an iterable of names, not a string"
+            )
         normalized_members = tuple(members)
         if not normalized_members:
             raise ValueError("structure group members must not be empty")
@@ -282,18 +292,16 @@ class LogicalStructureElement:
                 "logical structure element parent must be a tuple of path components"
             )
         normalized_parent = tuple(parent)
-        if any(
-            not isinstance(part, str) or not part for part in normalized_parent
-        ):
+        if any(not isinstance(part, str) or not part for part in normalized_parent):
             raise ValueError(
                 "logical structure element parent components must be non-empty strings"
             )
         if not isinstance(logical_name, str):
-            raise TypeError("logical structure element name must be a string")
+            raise TypeError("logical structure element name must be a string")  # pyright: ignore[reportUnreachable]
         if not logical_name:
             raise ValueError("logical structure element name must not be empty")
         if not isinstance(fragment, StructureFragment):
-            raise TypeError(
+            raise TypeError(  # pyright: ignore[reportUnreachable]
                 "logical structure element fragment must be a StructureFragment"
             )
         if names is None:
@@ -479,29 +487,39 @@ class StructureFragment:
         """
 
         if isinstance(parent, str):
-            raise TypeError("recursive structure parent must be a tuple of path components")
+            raise TypeError(
+                "recursive structure parent must be a tuple of path components"
+            )
         normalized_parent = tuple(parent)
         if any(not isinstance(part, str) or not part for part in normalized_parent):
-            raise ValueError("recursive structure parent components must be non-empty strings")
+            raise ValueError(
+                "recursive structure parent components must be non-empty strings"
+            )
         if not isinstance(logical_name, str):
-            raise TypeError("recursive structure logical_name must be a string")
+            raise TypeError("recursive structure logical_name must be a string")  # pyright: ignore[reportUnreachable]
         if not logical_name:
             raise ValueError("recursive structure logical_name must not be empty")
         if names is None:
             normalized_names = None
         else:
             if isinstance(names, str):
-                raise TypeError("recursive structure names must be an iterable of names, not a string")
+                raise TypeError(
+                    "recursive structure names must be an iterable of names, not a string"
+                )
             normalized_names = tuple(names)
             if not normalized_names:
-                raise ValueError("recursive structure names must not be empty when provided")
+                raise ValueError(
+                    "recursive structure names must not be empty when provided"
+                )
             if any(not isinstance(name, str) or not name for name in normalized_names):
                 raise ValueError("recursive structure names must be non-empty strings")
             if len(set(normalized_names)) != len(normalized_names):
                 raise ValueError("recursive structure names must be unique")
         if max_count is not None:
             if not isinstance(max_count, int) or isinstance(max_count, bool):
-                raise TypeError("recursive structure max_count must be an integer or None")
+                raise TypeError(
+                    "recursive structure max_count must be an integer or None"
+                )
             if max_count < 0:
                 raise ValueError("recursive structure max_count must be non-negative")
         by_path = {element.path: element for element in self.elements}
@@ -539,7 +557,6 @@ class StructureFragment:
             clone.elements,
             clone.logical_elements,
             clone._recursive_elements,
-            owner="structure fragment",
         )
         return clone
 
@@ -610,7 +627,9 @@ class StructureSpecification:
         elements: list[StructureElement] = []
         for node in structure.nodes:
             if node.path[: len(root_path)] != root_path:
-                raise ValueError("resolved structure contains a node outside its focus root")
+                raise ValueError(
+                    "resolved structure contains a node outside its focus root"
+                )
             relative = node.path[len(root_path) :]
             elements.append(StructureElement(path=relative, kind=node.kind))
         return cls(elements)
@@ -655,8 +674,6 @@ def _validate_logical_rule_uniqueness(
     elements: tuple[StructureElement, ...],
     logical_elements: tuple[LogicalStructureElement, ...],
     recursive_elements: tuple[_RecursiveStructureElement, ...],
-    *,
-    owner: str,
 ) -> None:
     by_path = {element.path: element for element in elements}
     owner_root_kind = by_path[()].kind
@@ -732,9 +749,7 @@ def _compose_structure_rules(
                 f"{StructureSpecification.format_path(mount.path)}: expected "
                 f"{target.kind.value}, got {mount.fragment._root.kind.value}"
             )
-        if any(
-            mount.path[: len(path)] == path for path in unconstrained_paths
-        ):
+        if any(mount.path[: len(path)] == path for path in unconstrained_paths):
             raise ValueError(
                 "cannot mount a structure fragment inside an unconstrained subtree: "
                 f"{StructureSpecification.format_path(mount.path)}"
@@ -819,10 +834,7 @@ def _compose_structure_rules(
             unique_unconstrained.append(path)
 
     for path in unique_unconstrained:
-        if any(
-            other != path and other[: len(path)] == path
-            for other in by_path
-        ):
+        if any(other != path and other[: len(path)] == path for other in by_path):
             raise ValueError(
                 "an unconstrained subtree cannot contain concrete child rules: "
                 f"{StructureSpecification.format_path(path)}"
@@ -834,18 +846,14 @@ def _compose_structure_rules(
                 "logical structure element parent is not defined: "
                 f"{StructureSpecification.format_path(logical.parent)}"
             )
-        if any(
-            logical.parent[: len(path)] == path for path in unique_unconstrained
-        ):
+        if any(logical.parent[: len(path)] == path for path in unique_unconstrained):
             raise ValueError(
                 "an unconstrained subtree cannot contain logical child rules: "
                 f"{StructureSpecification.format_path(logical.parent)}"
             )
         if logical.names is not None:
             explicit_names = {
-                path[-1]
-                for path in by_path
-                if path and path[:-1] == logical.parent
+                path[-1] for path in by_path if path and path[:-1] == logical.parent
             }
             eligible_names = set(logical.names) - explicit_names
             if logical.min_count > len(eligible_names):
@@ -861,9 +869,7 @@ def _compose_structure_rules(
                 "recursive structure parent is not defined: "
                 f"{StructureSpecification.format_path(recursive.parent)}"
             )
-        if any(
-            recursive.parent[: len(path)] == path for path in unique_unconstrained
-        ):
+        if any(recursive.parent[: len(path)] == path for path in unique_unconstrained):
             raise ValueError(
                 "an unconstrained subtree cannot contain recursive child rules: "
                 f"{StructureSpecification.format_path(recursive.parent)}"
@@ -902,7 +908,6 @@ def _compose_structure_rules(
         tuple(expanded_elements),
         tuple(expanded_logical),
         tuple(expanded_recursive),
-        owner=owner,
     )
 
     return (
@@ -912,6 +917,7 @@ def _compose_structure_rules(
         tuple(unique_unconstrained),
         tuple(expanded_recursive),
     )
+
 
 class Structure(ABC):
     """Interprets the placement and containment of runtime subjects."""
@@ -996,7 +1002,8 @@ class PythonStructure(Structure):
         module: ModuleType,
     ) -> Iterable[tuple[type[object], object]]:
         seen: set[int] = set()
-        for candidate in vars(module).values():
+        candidates = cast(Iterable[object], vars(module).values())
+        for candidate in candidates:
             if not isinstance(candidate, type):
                 continue
             if candidate.__module__ != module.__name__:
@@ -1025,14 +1032,15 @@ class PythonStructure(Structure):
         yield entity, parent
 
         prefix = entity.__qualname__ + "."
-        for candidate in vars(entity).values():
+        candidates = cast(Iterable[object], vars(entity).values())
+        for candidate in candidates:
             if not isinstance(candidate, type):
                 continue
             if candidate.__module__ != module.__name__:
                 continue
             if not candidate.__qualname__.startswith(prefix):
                 continue
-            relative = candidate.__qualname__[len(prefix):]
+            relative = candidate.__qualname__[len(prefix) :]
             if "." in relative or "<locals>" in relative:
                 continue
             yield from PythonStructure._entity_tree(

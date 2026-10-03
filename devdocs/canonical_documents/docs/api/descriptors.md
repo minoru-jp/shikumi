@@ -36,8 +36,6 @@ related: [Description Semantics](../specification/description.md)
 
 ## 記述器使用
 
-        
-
 ### `DescriptorUse`
 
 ```python
@@ -171,8 +169,6 @@ name: DescriptorUseRule
 kind: Type
 
 ## `@=` 用のクラス接続
-
-        
 
 ### `class_binding()`
 

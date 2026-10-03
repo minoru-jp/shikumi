@@ -7,7 +7,6 @@ from pathlib import Path
 from shikumi_devdoc.norms.document import system as document_system
 from shikumi_devdoc.norms.vocabulary import system as vocabulary_system
 
-
 DOCUMENT_MODULES = (
     "devdocs.canonical_sources.readme",
     "devdocs.canonical_sources.changelog",
@@ -58,8 +57,12 @@ def test_canonical_documents_have_no_unresolved_project_or_term_placeholders() -
 
 
 def test_api_and_specification_collections_use_structured_fields() -> None:
-    api = Path("devdocs/canonical_documents/docs/api/information.md").read_text(encoding="utf-8")
-    spec = Path("devdocs/canonical_documents/docs/specification/core.md").read_text(encoding="utf-8")
+    api = Path("devdocs/canonical_documents/docs/api/information.md").read_text(
+        encoding="utf-8"
+    )
+    spec = Path("devdocs/canonical_documents/docs/specification/core.md").read_text(
+        encoding="utf-8"
+    )
     assert "name: InformationType" in api
     assert "kind: Type" in api
     assert "input: value: object" in api
@@ -68,9 +71,15 @@ def test_api_and_specification_collections_use_structured_fields() -> None:
 
 
 def test_collection_indexes_are_generated_from_canonical_metadata() -> None:
-    guides_index = Path("devdocs/canonical_documents/docs/guides/INDEX.md").read_text(encoding="utf-8")
-    api_index = Path("devdocs/canonical_documents/docs/api/INDEX.md").read_text(encoding="utf-8")
-    spec_index = Path("devdocs/canonical_documents/docs/specification/INDEX.md").read_text(encoding="utf-8")
+    guides_index = Path("devdocs/canonical_documents/docs/guides/INDEX.md").read_text(
+        encoding="utf-8"
+    )
+    api_index = Path("devdocs/canonical_documents/docs/api/INDEX.md").read_text(
+        encoding="utf-8"
+    )
+    spec_index = Path(
+        "devdocs/canonical_documents/docs/specification/INDEX.md"
+    ).read_text(encoding="utf-8")
     assert "[Getting Started](getting-started.md)" in guides_index
     assert "[Project Layout and CLI](project-layout.md)" in guides_index
     assert "[Information API](information.md)" in api_index
@@ -101,7 +110,11 @@ def test_current_devdoc_authoring_constructs_are_used() -> None:
 
 
 def test_vocabulary_references_can_drive_document_titles() -> None:
-    source = Path("devdocs/canonical_sources/docs/api/information.py").read_text(encoding="utf-8")
-    canonical = Path("devdocs/canonical_documents/docs/api/information.md").read_text(encoding="utf-8")
+    source = Path("devdocs/canonical_sources/docs/api/information.py").read_text(
+        encoding="utf-8"
+    )
+    canonical = Path("devdocs/canonical_documents/docs/api/information.md").read_text(
+        encoding="utf-8"
+    )
     assert 'title @= "{{TERM_13}}"' in source
     assert "## 情報" in canonical

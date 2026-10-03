@@ -36,8 +36,6 @@ related: [Core Semantics](../specification/core.md)
 
 ## 意味像
 
-        
-
 ### `ViewItem`
 
 ```python

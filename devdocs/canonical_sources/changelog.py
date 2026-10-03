@@ -1,8 +1,9 @@
 """Canonical Japanese changelog source for Shikumi."""
 
-from devdocs.canonical_sources.docs.vocabulary import TERMS
 from shikumi_devdoc.fields.changelog import added, changed, released_on, version
 from shikumi_devdoc.norms.common import canonical_source, merge
+
+from devdocs.canonical_sources.docs.vocabulary import TERMS
 
 
 @canonical_source("Shikumi 変更履歴", filename="CHANGELOG.md", heading="title")
@@ -13,6 +14,21 @@ class CHANGELOG:
 
     class UNRELEASED:
         """次の公開リリースへ向けた変更。"""
+
+    class V0_2_3:
+        """静的解析と CI 品質ゲートを整備した内部品質改善リリース。"""
+
+        version @= "0.2.3"
+        released_on @= "2026-10-03"
+
+        class INTERNAL:
+            """Ruff と basedpyright を開発時および CI の品質ゲートへ追加し、既存コードを両チェックで clean な状態へ整備した。公開 API と CLI の契約は変更していない。"""
+
+            changed @= "CLI JSON の `diagnostic_counts` について、型定義と実際の payload のキー集合が `DiagnosticSeverity` と同期することを回帰テストで固定した。"
+            changed @= "通常 CI と release workflow が同じ reusable quality / test checks を利用するよう整理し、release tag の commit が Ruff、basedpyright、canonical document drift、Python 3.11 から 3.14 の test suite を通過した後だけ build / publish へ進むようにした。"
+            changed @= "従来 mypy の unused-ignore を前提としていた `tests/typing` の consumer typing contract を basedpyright 専用設定と rule 指定付き `pyright: ignore` へ移行し、通常 CI と release checks の双方で検証するようにした。"
+            changed @= "Ruff formatter を開発・CI の品質ゲートへ追加し、実装・テスト・canonical source などの編集対象を統一フォーマットへ揃えた。canonical / published document などの生成物は正本生成フローを優先し、formatter の直接編集対象から除外した。"
+            changed @= "`shikumi-devdoc` の version 制約を `[dependency-groups].docs` に一元化し、test group と CI は dependency group を通じて同じ制約を利用するよう整理した。"
 
     class V0_2_2:
         """PyPI から公開文書へ辿れるよう README と package metadata の公開リンクを整備。"""
@@ -61,10 +77,14 @@ class CHANGELOG:
 
         version @= "0.1.0"
         released_on @= "2026-09-12"
-        added @= "情報、記述器使用、構造、意味像を分離した Core の意味モデルを追加した。"
+        added @= (
+            "情報、記述器使用、構造、意味像を分離した Core の意味モデルを追加した。"
+        )
         added @= "実体・module・packageを同じ仕組みで扱う検証と、独立した実現器による実現を追加した。"
         added @= "デコレータ、`@=`、docstring、package treeなど、再利用可能な Standard の記述器と構造実装を追加した。"
-        added @= "規定体、記述体、実現器を通常の Python 参照として結線する CLI を追加した。"
+        added @= (
+            "規定体、記述体、実現器を通常の Python 参照として結線する CLI を追加した。"
+        )
         added @= "README、Glossary、API Reference、Distribution Guide からなる英語の公開文書体系を追加した。公開文書は日本語の canonical source を正本として生成・翻訳する。"
         added @= "architecture、structured docs、Web API、`structure-from` の4方向を示す公式作例を追加した。"
 

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "shikumi"
-version = "0.2.2"
+version = "0.2.3"
 description = "Interpret Python runtime objects as structured semantic views."
 keywords = [
   "semantic-modeling",
@@ -37,7 +37,15 @@ Issues = "https://github.com/minoru-jp/shikumi/issues"
 shikumi = "shikumi.cli:main"
 
 [dependency-groups]
-docs = ["shikumi-devdoc>=0.3.0"]
+docs = ["shikumi-devdoc>=0.3.2"]
+test = [
+  { include-group = "docs" },
+  "shikumi-devdoc[test]",
+]
+quality = [
+  "basedpyright==1.40.1",
+  "ruff==0.16.10",
+]
 
 [tool.pytest.ini_options]
 addopts = "-q"
@@ -62,3 +70,29 @@ packages = ["src/shikumi"]
 exclude = [
   "/.github",
 ]
+
+[tool.ruff]
+target-version = "py311"
+
+[tool.ruff.format]
+# Generated and translated Markdown is governed by the canonical-source workflow,
+# not by direct formatter edits. Ruff still formats the Python source that
+# produces these artifacts.
+exclude = [
+  "README.md",
+  "CHANGELOG.md",
+  "STATUS.md",
+  "docs/**",
+  "devdocs/README.md",
+  "devdocs/canonical_documents/**",
+  "examples/**/README.md",
+]
+
+[tool.basedpyright]
+include = ["src/shikumi"]
+pythonVersion = "3.11"
+reportUnnecessaryIsInstance = false
+reportImplicitStringConcatenation = false
+reportExplicitAny = false
+reportPrivateUsage = false
+reportImplicitOverride = false

@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from inspect import cleandoc
-from typing import Any, Callable, Generic, Self, TypeVar, cast
+from typing import Any, Generic, Self, TypeVar, cast
 
 from ..binding import class_binding
 from ..description import record_descriptor_use
 from ..information import InformationType, attach_information
-
 
 T = TypeVar("T")
 S = TypeVar("S")
@@ -17,7 +17,8 @@ S = TypeVar("S")
 class _AssignmentWriter(Generic[T]):
     """Standard ``@=`` writer that attaches values without interpretation."""
 
-    __slots__ = ("information_type",)
+    __slots__: tuple[str, ...] = ("information_type",)
+    information_type: InformationType[T]
 
     def __init__(self, information_type: InformationType[T]) -> None:
         self.information_type = information_type
@@ -29,8 +30,8 @@ class _AssignmentWriter(Generic[T]):
         return cast(Self, class_binding(value, self._connect))
 
     def _connect(self, subject: type[object], value: T) -> None:
-        record_descriptor_use(subject, self)
-        attach_information(
+        _ = record_descriptor_use(subject, self)
+        _ = attach_information(
             subject,
             self.information_type,
             value,
@@ -40,15 +41,16 @@ class _AssignmentWriter(Generic[T]):
 class _DecoratorWriter(Generic[T]):
     """Standard decorator writer that attaches values without interpretation."""
 
-    __slots__ = ("information_type",)
+    __slots__: tuple[str, ...] = ("information_type",)
+    information_type: InformationType[T]
 
     def __init__(self, information_type: InformationType[T]) -> None:
         self.information_type = information_type
 
     def __call__(self, value: T) -> Callable[[S], S]:
         def apply(subject: S) -> S:
-            record_descriptor_use(subject, self)
-            attach_information(
+            _ = record_descriptor_use(subject, self)
+            _ = attach_information(
                 subject,
                 self.information_type,
                 value,
@@ -61,7 +63,10 @@ class _DecoratorWriter(Generic[T]):
 class DocstringWriter:
     """Write string information from an explicitly decorated object's docstring."""
 
-    __slots__ = ("information_type", "clean", "required")
+    __slots__: tuple[str, ...] = ("clean", "information_type", "required")
+    information_type: InformationType[Any]
+    clean: bool
+    required: bool
 
     def __init__(
         self,
@@ -71,13 +76,15 @@ class DocstringWriter:
         required: bool = False,
     ) -> None:
         if not information_type.accepts(""):
-            raise TypeError("docstring writers require an information type accepting str")
+            raise TypeError(
+                "docstring writers require an information type accepting str"
+            )
         self.information_type = information_type
         self.clean = clean
         self.required = required
 
     def __call__(self, subject: S) -> S:
-        record_descriptor_use(subject, self)
+        _ = record_descriptor_use(subject, self)
         raw = getattr(subject, "__doc__", None)
         if raw is None:
             if self.required:
@@ -87,7 +94,7 @@ class DocstringWriter:
             raise TypeError("subject __doc__ must be a string or None")
 
         value = cleandoc(raw) if self.clean else raw
-        attach_information(
+        _ = attach_information(
             subject,
             self.information_type,
             value,

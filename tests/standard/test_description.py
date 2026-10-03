@@ -15,7 +15,7 @@ from shikumi.standard import assignment, content_type, decorator, docstring
 
 def _defined_class(source: str, **names: object) -> type[object]:
     namespace: dict[str, object] = {"__name__": "tests.standard.description", **names}
-    exec(compile(source, "<standard-description-test>", "exec"), namespace)
+    exec(compile(source, "<standard-description-test>", "exec"), namespace)  # noqa: S102 - trusted in-test source is executed intentionally
     return namespace["Page"]  # type: ignore[return-value]
 
 
@@ -89,7 +89,9 @@ def test_standard_writers_can_write_the_same_information_type() -> None:
 
     try:
         shikumi = Shikumi(information_types=[title_type])
-        assert shikumi.view(AssignmentPage).focused.values(title_type) == ("Assignment",)
+        assert shikumi.view(AssignmentPage).focused.values(title_type) == (
+            "Assignment",
+        )
         assert shikumi.view(DecoratorPage).focused.values(title_type) == ("Decorator",)
     finally:
         clear_information(AssignmentPage)
@@ -114,9 +116,9 @@ def test_docstring_writer_turns_runtime_docstring_into_information() -> None:
         assert records[0].type is Content
         assert records[0].value == "First line.\n\nSecond line."
         assert descriptor_uses_of(Page)[0].descriptor is content
-        assert Shikumi(information_types=[Content]).view(Page).focused.values(Content) == (
-            "First line.\n\nSecond line.",
-        )
+        assert Shikumi(information_types=[Content]).view(Page).focused.values(
+            Content
+        ) == ("First line.\n\nSecond line.",)
     finally:
         clear_information(Page)
         clear_descriptor_uses(Page)
@@ -138,6 +140,7 @@ def test_required_docstring_writer_rejects_missing_docstring() -> None:
     content = docstring(Content, required=True)
 
     with pytest.raises(ValueError, match="requires a docstring"):
+
         @content
         class Page:
             __doc__ = None
@@ -155,7 +158,10 @@ def test_standard_assignment_records_descriptor_use() -> None:
     kind = assignment(kind_type)
 
     namespace = {"kind": kind, "__name__": "tests.standard.descriptor_assignment"}
-    exec(compile('class Page:\n    kind @= "page"\n', "<descriptor-assignment>", "exec"), namespace)
+    exec(  # noqa: S102 - trusted in-test source is executed intentionally
+        compile('class Page:\n    kind @= "page"\n', "<descriptor-assignment>", "exec"),
+        namespace,
+    )
     Page = namespace["Page"]
 
     try:

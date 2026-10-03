@@ -17,7 +17,7 @@ from shikumi.standard import PackageTreeStructure, assignment, information_type_
 
 def _defined_class(source: str, **names: object) -> type[object]:
     namespace: dict[str, object] = {"__name__": "tests.integration", **names}
-    exec(compile(source, "<integration-test>", "exec"), namespace)
+    exec(compile(source, "<integration-test>", "exec"), namespace)  # noqa: S102 - trusted in-test source is executed intentionally
     return namespace["Page"]  # type: ignore[return-value]
 
 
@@ -62,26 +62,26 @@ def test_standard_package_flow_uses_runtime_imported_information(
     root = tmp_path / "shikumi_integration_docs"
     root.mkdir()
     (root / "__init__.py").write_text(
-        "\n".join(
+        "\n".join(  # noqa: FLY002 - line list is clearer for generated fixture source
             [
                 "from shikumi.standard import content_type, docstring",
                 "Content = content_type()",
                 "content = docstring(Content)",
                 "@content",
                 "class Root:",
-                '    \"\"\"Root document.\"\"\"',
+                '    """Root document."""',
                 "",
             ]
         ),
         encoding="utf-8",
     )
     (root / "guide.py").write_text(
-        "\n".join(
+        "\n".join(  # noqa: FLY002 - line list is clearer for generated fixture source
             [
                 "from . import content",
                 "@content",
                 "class Guide:",
-                '    \"\"\"Guide document.\"\"\"',
+                '    """Guide document."""',
                 "",
             ]
         ),

@@ -13,7 +13,6 @@ from shikumi import (
 )
 from shikumi.standard import PackageTreeStructure
 
-
 open_package = StructureFragment.unconstrained(StructuralKind.PACKAGE)
 closed_package = StructureFragment([StructureElement((), StructuralKind.PACKAGE)])
 closed_module = StructureFragment([StructureElement((), StructuralKind.MODULE)])

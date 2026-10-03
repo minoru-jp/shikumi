@@ -7,8 +7,8 @@ import pytest
 from shikumi import (
     Diagnostic,
     DiagnosticSeverity,
-    InformationType,
     Focus,
+    InformationType,
     PythonStructure,
     Shikumi,
     StructuralKind,
@@ -22,7 +22,7 @@ from shikumi import (
 
 def _module(name: str, source: str) -> types.ModuleType:
     module = types.ModuleType(name)
-    exec(compile(source, f"<{name}>", "exec"), module.__dict__)
+    exec(compile(source, f"<{name}>", "exec"), module.__dict__)  # noqa: S102 - trusted in-test source is executed intentionally
     return module
 
 
@@ -87,7 +87,9 @@ def test_module_and_entity_rules_share_one_validation_operation() -> None:
     def entity_rule(view):
         calls.append(("entity", view.focus.subject))
 
-    result = Shikumi(validators=[module_rule, entity_rule]).validate(module, placement=("docs", "shared"))
+    result = Shikumi(validators=[module_rule, entity_rule]).validate(
+        module, placement=("docs", "shared")
+    )
 
     assert result.is_valid
     assert calls == [

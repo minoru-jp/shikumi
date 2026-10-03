@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Callable, Generic, TypeVar
-
+from typing import Generic, TypeVar
 
 T = TypeVar("T")
 
@@ -44,5 +44,5 @@ def class_binding(
     """
 
     if not callable(connect):
-        raise TypeError("connect must be callable")
+        raise TypeError("connect must be callable")  # pyright: ignore[reportUnreachable]
     return _ClassBinding((value,), connect)

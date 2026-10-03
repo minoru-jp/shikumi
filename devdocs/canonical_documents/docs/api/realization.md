@@ -36,8 +36,6 @@ related: [Realization Semantics](../specification/realization.md)
 
 ## 実現
 
-        
-
 ### `RealizationCheck`
 
 ```python

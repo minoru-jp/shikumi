@@ -1,16 +1,20 @@
 """Canonical Japanese guide for authoring Shikumi descriptors."""
 
-from devdocs.canonical_sources.docs.vocabulary import TERMS
 from shikumi_devdoc.norms.common import canonical_source, merge, summary
 from shikumi_devdoc.norms.document import test_target_field, title
 
+from devdocs.canonical_sources.docs.vocabulary import TERMS
 
 decorator_code = test_target_field("decorator example")
 parameterized_code = test_target_field("parameterized decorator example")
 binding_code = test_target_field("class binding example")
 rule_code = test_target_field("descriptor rule example")
+
+
 @summary("通常の Python を使って decorator や @= 記述器を定義する実装ガイド。")
-@canonical_source("記述器を定義する", filename="descriptor-authoring.md", order=20, heading="title")
+@canonical_source(
+    "記述器を定義する", filename="descriptor-authoring.md", order=20, heading="title"
+)
 class GUIDE:
     """{{TERM_1}} は具体的な{{TERM_15}} syntax を規定しない。規定体の著者は通常の Python で記述器を定義し、必要な runtime fact を明示的に記録する。"""
 
@@ -24,9 +28,10 @@ class GUIDE:
         {{decorator_code}}
         ```
         """
-        title @= '引数を取らない decorator'
 
-        decorator_code @= r'''
+        title @= "引数を取らない decorator"
+
+        decorator_code @= r"""
         from shikumi import (
             Cardinality,
             InformationType,
@@ -61,7 +66,7 @@ class GUIDE:
 
         assert [record.value for record in information_of(Owner)] == ["attr"]
         assert descriptor_uses_of(UserService)[0].subject is UserService
-        '''
+        """
 
     class SECTION_002:
         """decorator factory の引数や戻り値の作り方は記述器著者が所有する。{{TERM_1}} は signature から情報を推論しない。
@@ -70,11 +75,12 @@ class GUIDE:
         {{parameterized_code}}
         ```
         """
-        title @= '引数を取る decorator'
+
+        title @= "引数を取る decorator"
 
         merge @= TERMS.TERM_1
 
-        parameterized_code @= r'''
+        parameterized_code @= r"""
         from shikumi import (
             Cardinality,
             InformationType,
@@ -103,7 +109,7 @@ class GUIDE:
             pass
 
         assert information_of(UserService)[0].value is UserRepository
-        '''
+        """
 
     class SECTION_003:
         """class body の評価時点では接続先 class がまだ成立していない。`class_binding()` を使うと class 成立後に callback を実行でき、同じ binding name への繰り返し `@=` も記述順に再生される。
@@ -112,9 +118,10 @@ class GUIDE:
         {{binding_code}}
         ```
         """
-        title @= '独自の @= 記述器'
 
-        binding_code @= r'''
+        title @= "独自の @= 記述器"
+
+        binding_code @= r"""
         from shikumi import (
             Cardinality,
             InformationType,
@@ -144,7 +151,7 @@ class GUIDE:
             "application",
             "users",
         ]
-        '''
+        """
 
     class SECTION_004:
         """記述器をどこで使用可能・推奨とするかは `DescriptorUseRule` と `StructureSelector` で記述できる。情報内容の validation とは別の責務である。
@@ -153,9 +160,10 @@ class GUIDE:
         {{rule_code}}
         ```
         """
-        title @= '記述器使用規則を組み合わせる'
 
-        rule_code @= r'''
+        title @= "記述器使用規則を組み合わせる"
+
+        rule_code @= r"""
         from shikumi import (
             DescriptorUseRule,
             InformationType,
@@ -189,4 +197,4 @@ class GUIDE:
 
         result = system.validate(Endpoint)
         assert result.is_valid
-        '''
+        """

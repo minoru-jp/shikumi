@@ -2,14 +2,14 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterator
 from dataclasses import dataclass
-from typing import Any, Iterator, TypeVar, cast
+from typing import Any, TypeVar, cast
 
 from .description import DescriptorUse, same_descriptor
 from .errors import UnknownViewSubjectError
 from .information import Information, InformationType
 from .structure import Focus, ResolvedStructure, StructuralKind, StructureNode
-
 
 T = TypeVar("T")
 
@@ -37,9 +37,7 @@ class ViewItem:
         """Return records of *information_type* by identity."""
 
         records = tuple(
-            record
-            for record in self.information
-            if record.type is information_type
+            record for record in self.information if record.type is information_type
         )
         return cast(tuple[Information[T], ...], records)
 
@@ -118,9 +116,7 @@ class SemanticView:
 
         root_path = focused.node.path
         selected_items = tuple(
-            item
-            for item in self.items
-            if item.node.path[: len(root_path)] == root_path
+            item for item in self.items if item.node.path[: len(root_path)] == root_path
         )
         selected_nodes = tuple(item.node for item in selected_items)
         focus = Focus(focused.subject, placement=root_path)

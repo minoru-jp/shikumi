@@ -9,7 +9,6 @@ from typing import Generic, TypeVar
 from .validation import Diagnostic, DiagnosticSeverity
 from .view import SemanticView
 
-
 ArtifactT = TypeVar("ArtifactT")
 
 
@@ -26,7 +25,9 @@ class RealizationCheck:
             if not isinstance(item, Diagnostic):
                 raise TypeError("realization diagnostics must be Diagnostic objects")
             normalized.append(
-                item if item.subject is not None else replace(item, subject=self.view.focus.subject)
+                item
+                if item.subject is not None
+                else replace(item, subject=self.view.focus.subject)
             )
         object.__setattr__(self, "diagnostics", tuple(normalized))
 

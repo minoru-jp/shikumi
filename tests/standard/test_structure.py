@@ -83,7 +83,9 @@ def test_package_tree_structure_keeps_single_module_focus_non_recursive(
                 sys.modules.pop(name, None)
 
 
-def test_descriptor_selector_paths_are_package_root_relative(tmp_path, monkeypatch) -> None:
+def test_descriptor_selector_paths_are_package_root_relative(
+    tmp_path, monkeypatch
+) -> None:
     import sys
     import types
 

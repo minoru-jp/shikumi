@@ -1,13 +1,23 @@
 """Structure semantics specification."""
 
-from shikumi_devdoc.fields.specification import MUST, MUST_NOT, condition, detail, level, related
+from shikumi_devdoc.fields.specification import (
+    MUST,
+    MUST_NOT,
+    condition,
+    detail,
+    level,
+    related,
+)
 from shikumi_devdoc.norms.common import canonical_source, summary
 from shikumi_devdoc.norms.document import title
+
 from devdocs.canonical_sources.docs.specification.core import SPECIFICATION_PART as CORE
 
 
 @summary("焦点、構造解決、構造規定の一致判定に関する契約。")
-@canonical_source("Structure Semantics", filename="structure.md", order=20, heading="identity")
+@canonical_source(
+    "Structure Semantics", filename="structure.md", order=20, heading="identity"
+)
 class SPECIFICATION_PART:
     """runtime object を package、module、entity の構造として扱う契約。"""
 
@@ -121,5 +131,3 @@ class SPECIFICATION_PART:
 
         title @= "Structure groups constrain sibling cardinality only"
         level @= MUST
-
-

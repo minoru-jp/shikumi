@@ -8,7 +8,7 @@ Placed Markdown is not the source of truth. Documentation changes flow in one di
 
 `shikumi-devdoc` is a development-time tool used to generate documentation for this repository. It is not a runtime dependency of the `shikumi` package.
 
-At the package level, `shikumi-devdoc` uses `shikumi`. At the repository-maintenance level, this repository uses `shikumi-devdoc`. Therefore `shikumi-devdoc` is pinned in `[dependency-groups].docs` and is not added to `[project.dependencies]`.
+At the package level, `shikumi-devdoc` uses `shikumi`. At the repository-maintenance level, this repository uses `shikumi-devdoc`. Its version constraint is therefore centralized in `[dependency-groups].docs`; the test group includes the docs group and adds the test extra, and CI installs these dependency groups rather than duplicating the constraint. `shikumi-devdoc` is not added to `[project.dependencies]`.
 
 During documentation generation, the checked-out `src/shikumi` is importable so `shikumi-devdoc` interprets the version of Shikumi currently being developed.
 
@@ -125,4 +125,4 @@ For documentation changes, verify at least that:
 - published code examples, links, and public names remain valid; and
 - packaging tests match the intended placement of distributed documents.
 
-GitHub Actions also runs these checks in hosted CI. Pushes and pull requests to `main` run the test suite on Python 3.11 through 3.14 and check canonical-document drift; a separate job builds the wheel and sdist and verifies their contents. Local verification remains the basic pre-publication workflow.
+GitHub Actions also runs these checks in hosted CI. Pushes and pull requests to `main` use reusable checks for Ruff lint and formatting, package-source basedpyright, the dedicated `tests/typing` consumer typing contract, the Python 3.11 through 3.14 test suite, and canonical-document drift; a separate job builds the wheel and sdist and verifies their contents. The consumer typing contract uses its own basedpyright configuration to verify the public typed API's accept/reject behavior and to fail on ignore directives that have become unnecessary. The release workflow re-runs the same reusable checks against the release-tag commit and proceeds to build and publish only after they succeed. Local verification remains the basic pre-publication workflow.

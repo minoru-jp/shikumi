@@ -6,7 +6,6 @@ from pathlib import Path
 import shikumi
 import shikumi.standard
 
-
 _LINK = re.compile(r"\[[^\]]*\]\(([^)]+)\)")
 
 
@@ -33,9 +32,12 @@ def test_public_relative_markdown_links_resolve() -> None:
     assert not missing, missing
 
 
-def test_every_exported_python_api_name_is_present_in_api_reference_collection() -> None:
+def test_every_exported_python_api_name_is_present_in_api_reference_collection() -> (
+    None
+):
     api_text = "\n".join(
-        path.read_text(encoding="utf-8") for path in sorted(Path("docs/api").glob("*.md"))
+        path.read_text(encoding="utf-8")
+        for path in sorted(Path("docs/api").glob("*.md"))
     )
     for name in (*shikumi.__all__, *shikumi.standard.__all__):
         assert f"`{name}" in api_text or f"name: {name}" in api_text, name
@@ -71,9 +73,19 @@ def test_published_collection_topology_matches_canonical_collection_indexes() ->
 def _api_name_values() -> set[str]:
     from shikumi_devdoc.norms._document import DocumentField, FieldValue
     from shikumi_devdoc.norms.document import system as document_system
-    from devdocs.canonical_sources.docs.api import cli, descriptors, errors, information
-    from devdocs.canonical_sources.docs.api import realization, semantic_view, shikumi as shikumi_doc
-    from devdocs.canonical_sources.docs.api import standard, structure, validation
+
+    from devdocs.canonical_sources.docs.api import (
+        cli,
+        descriptors,
+        errors,
+        information,
+        realization,
+        semantic_view,
+        standard,
+        structure,
+        validation,
+    )
+    from devdocs.canonical_sources.docs.api import shikumi as shikumi_doc
 
     modules = (
         information,
@@ -146,6 +158,6 @@ def test_published_api_and_specification_preserve_canonical_structure() -> None:
                 continue
             published = Path("docs") / collection / canonical.name
             assert published.is_file(), published
-            assert _document_structure_signature(published) == _document_structure_signature(
-                canonical
-            ), published
+            assert _document_structure_signature(
+                published
+            ) == _document_structure_signature(canonical), published

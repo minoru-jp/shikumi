@@ -24,7 +24,7 @@ canonical source は `devdocs/canonical_sources/devdocs/readme.py` です。
 
 `shikumi-devdoc` はこのリポジトリの文書生成に使う開発時ツールであり、`shikumi` package の実行時依存ではない。
 
-package としては `shikumi-devdoc` が `shikumi` を利用する。一方、このリポジトリは開発工程で `shikumi-devdoc` を利用する。そのため `shikumi-devdoc` は `[dependency-groups].docs` に固定し、`[project.dependencies]` には追加しない。
+package としては `shikumi-devdoc` が `shikumi` を利用する。一方、このリポジトリは開発工程で `shikumi-devdoc` を利用する。そのため `shikumi-devdoc` の version 制約は `[dependency-groups].docs` に一元化し、test group は docs group を include して test extra を追加する。CI もこれらの dependency group を利用し、`[project.dependencies]` には追加しない。
 
 文書生成時には checkout 中の `src/shikumi` を import 可能にし、開発中の Shikumi 実装で canonical source を解釈する。
 
@@ -139,4 +139,4 @@ sdist はその release を再構成・検証・理解できる完全な release
 - published document のコード、リンク、公開名が壊れていない。
 - distribution 対象文書の配置が packaging test と一致する。
 
-GitHub Actions の hosted CI でもこれらの検査を実行する。`main` への push と pull request では Python 3.11 から 3.14 の test suite と canonical document の drift 検査を行い、別 job で wheel / sdist を build して distribution 内容も検査する。ローカル検証は引き続き変更を公開する前の基本手順とする。
+GitHub Actions の hosted CI でもこれらの検査を実行する。`main` への push と pull request では reusable checks を通して Ruff の lint / format check、本体コードの basedpyright、`tests/typing` の consumer typing contract、Python 3.11 から 3.14 の test suite、canonical document の drift 検査を行い、別 job で wheel / sdist を build して distribution 内容も検査する。consumer typing contract は専用の basedpyright 設定で、公開型 API の受理・拒否契約と不要になった ignore を検査する。release workflow も同じ reusable checks を release tag の commit に対して再実行し、成功した場合だけ build / publish へ進む。ローカル検証は引き続き変更を公開する前の基本手順とする。

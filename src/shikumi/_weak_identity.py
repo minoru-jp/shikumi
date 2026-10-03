@@ -9,9 +9,9 @@ read.
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
 from threading import RLock
-from collections.abc import Callable
 from typing import Generic, TypeVar
 from weakref import ReferenceType, ref
 
@@ -27,7 +27,9 @@ class _Entry(Generic[_RecordT]):
 class WeakIdentityRegistry(Generic[_RecordT]):
     """Map weak-referenceable objects to ordered records by object identity."""
 
-    __slots__ = ("_entries", "_lock", "_subject_error")
+    __slots__: tuple[str, ...] = ("_entries", "_lock", "_subject_error")
+    _lock: RLock
+    _subject_error: str
 
     def __init__(self, *, subject_error: str) -> None:
         self._entries: dict[int, _Entry[_RecordT]] = {}

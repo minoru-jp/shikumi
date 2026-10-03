@@ -1,12 +1,27 @@
 """CLI semantic specification."""
 
-from shikumi_devdoc.fields.specification import MUST, MUST_NOT, detail, level, condition, related
+from shikumi_devdoc.fields.specification import (
+    MUST,
+    MUST_NOT,
+    condition,
+    level,
+    related,
+)
 from shikumi_devdoc.norms.common import canonical_source, summary
 from shikumi_devdoc.norms.document import title
-from devdocs.canonical_sources.docs.specification.public_api import SPECIFICATION_PART as PUBLIC_API
-from devdocs.canonical_sources.docs.specification.structure import SPECIFICATION_PART as STRUCTURE
-from devdocs.canonical_sources.docs.specification.validation import SPECIFICATION_PART as VALIDATION
-from devdocs.canonical_sources.docs.specification.realization import SPECIFICATION_PART as REALIZATION
+
+from devdocs.canonical_sources.docs.specification.public_api import (
+    SPECIFICATION_PART as PUBLIC_API,
+)
+from devdocs.canonical_sources.docs.specification.realization import (
+    SPECIFICATION_PART as REALIZATION,
+)
+from devdocs.canonical_sources.docs.specification.structure import (
+    SPECIFICATION_PART as STRUCTURE,
+)
+from devdocs.canonical_sources.docs.specification.validation import (
+    SPECIFICATION_PART as VALIDATION,
+)
 
 
 @summary("validate / realize command、Python reference、exit code、JSON 応答の契約。")
