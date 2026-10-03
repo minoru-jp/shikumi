@@ -112,7 +112,9 @@ class GUIDE:
         """
 
     class SECTION_003:
-        """class body の評価時点では接続先 class がまだ成立していない。`class_binding()` を使うと class 成立後に callback を実行でき、同じ binding name への繰り返し `@=` も記述順に再生される。
+        """class body の評価時点では接続先 class がまだ成立していない。`class_binding()` は class body の実行完了後、かつ `__init_subclass__()` より前の class 作成処理中に callback を実行し、同じ binding name への繰り返し `@=` を記述順に再生する。現在の実装はこのタイミングを `__set_name__()` で実現するため、`__init_subclass__()` で追加される状態へ callback から依存してはならない。callback の例外は Shikumi が正規化せず Python runtime の class-creation semantics に従うため、Python 3.11 と 3.12 以降で外部から見える例外形状が異なる。
+
+        `@=` は Shikumi Core が要求する syntax ではなく、独自{{TERM_15}}を作るために選択できる方法の一つである。通常の authoring flow では、外側の名前空間に保持された writer 自体は消費されず、各 class body の同名 name に一時 binding が置かれる。binding object 自体の aliasing や class 間での直接再利用は、公開された authoring contract には含めない。
 
         ```python
         {{binding_code}}
@@ -121,9 +123,12 @@ class GUIDE:
 
         title @= "独自の @= 記述器"
 
+        merge @= TERMS.TERM_15
+
         binding_code @= r"""
         from shikumi import (
             Cardinality,
+            ClassBinding,
             InformationType,
             attach_information,
             class_binding,
@@ -134,10 +139,10 @@ class GUIDE:
         Tag = InformationType("tag", str, cardinality=Cardinality.MANY)
 
         class TagDescriptions:
-            def __imatmul__(self, value: str):
+            def __imatmul__(self, value: str) -> ClassBinding[str]:
                 return class_binding(value, self._connect)
 
-            def _connect(self, subject: type, value: str) -> None:
+            def _connect(self, subject: type[object], value: str) -> None:
                 record_descriptor_use(subject, self)
                 attach_information(subject, Tag, value)
 

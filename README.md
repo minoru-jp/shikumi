@@ -22,7 +22,7 @@ These application-specific semantics are not built into Shikumi. They are define
 pip install shikumi
 ```
 
-Current version: `0.2.3`. Shikumi requires Python `>=3.11`. Development status is Beta from 0.2.0.
+Current version: `0.2.4`. Shikumi requires Python `>=3.11`. Development status is Beta from 0.2.0.
 
 ## Minimal example
 
@@ -87,6 +87,14 @@ Shikumi is not a static analyzer that reconstructs meaning from Python source or
 **Only give Shikumi modules and packages that contain trusted Python code.** Import-time code executes with the normal privileges of the current process even when the purpose is Validation.
 
 The exact contracts for runtime determination, Structure, Validation, and Realization are documented in the [Specification](https://github.com/minoru-jp/shikumi/blob/main/docs/specification/INDEX.md).
+
+## Standard `@=` authoring style
+
+The `title @= "Overview"` syntax in the minimal example is not required by Shikumi Core. Shikumi leaves the concrete Python syntax of Descriptors open; `shikumi.standard` provides `assignment()` and other reusable standard Descriptors as one convenient authoring style.
+
+With this `@=` style, the Descriptor object held in an outer namespace such as a module is not consumed or mutated by the write. A temporary class binding is placed under the same name in the class-body namespace and is used during class creation. The same Descriptor can therefore be used again as the starting point in another class body.
+
+See [Descriptor Authoring](https://github.com/minoru-jp/shikumi/blob/main/docs/guides/descriptor-authoring.md) when implementing a custom Descriptor syntax.
 
 ## Official example
 

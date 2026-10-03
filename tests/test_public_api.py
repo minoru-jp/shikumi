@@ -7,6 +7,7 @@ from shikumi import standard
 def test_core_public_surface_matches_api_reference_layering() -> None:
     expected = {
         "Cardinality",
+        "ClassBinding",
         "Diagnostic",
         "DiagnosticSeverity",
         "DescriptorUse",

@@ -140,23 +140,43 @@ kind: Type
 
 ## Class binding for `@=`
 
+### `ClassBinding[T]`
+
+```python
+class ClassBinding(Protocol[T_contra]):
+    def __imatmul__(self, value: T_contra) -> Self: ...
+```
+
+Public static typing contract for the temporary value returned by `class_binding()`. It expresses that additional values of the same type as the initial value can be written with `@=` under the same class-body name.
+
+`ClassBinding[T]` is a typing contract. The concrete runtime binding class and its internal state are not part of the public API. Custom Descriptors normally obtain this type from `class_binding()` rather than constructing it directly.
+
+related: [DESC_006](../specification/description.md#desc_006)
+
+name: ClassBinding
+
+kind: Type
+
 ### `class_binding()`
 
 ```python
 def class_binding(
     value: T,
-    connect: Callable[[type, T], None],
-) -> object
+    connect: Callable[[type[object], T], None],
+) -> ClassBinding[T]
 ```
 
-Low-level API for applying processing after a class has been created when the target class does not yet exist during execution of its class body.
+Low-level API for applying processing during class creation, after the class body has finished executing and before `__init_subclass__()`, when the target class did not yet exist while the class body was running. The current implementation realizes this timing through `__set_name__()`.
 
-It is intended for authors of custom `@=` Descriptors. Shikumi does not interpret the type or meaning of `value`; it only guarantees that `connect(subject, value)` is called after the class has been created.
+Authors of custom `@=` Descriptors can use this API, but Shikumi Core does not require `@=` as a Descriptor syntax. Shikumi does not interpret the type or meaning of `value`; it only guarantees that `connect(subject, value)` is called at the timing described above. `connect` must not depend on state added by `__init_subclass__()`. Shikumi does not normalize exceptions raised by `connect`, so the externally visible exception shape follows Python's class-creation semantics. On Python 3.11, exceptions raised from `__set_name__()` are wrapped in `RuntimeError`; on Python 3.12 and later, the original exception is propagated with a runtime note. Consumers should not rely on a version-independent wrapper exception.
 
 The returned object can receive consecutive `@=` operations under the same name.
 
+In the normal authoring flow, the writer held in an outer namespace such as a module is not consumed. A temporary binding is placed under the corresponding name in each class-body namespace. Aliasing the binding object itself or directly reusing it across multiple classes is not part of the public contract.
+
 ```python
 from shikumi import (
+    ClassBinding,
     InformationType,
     attach_information,
     class_binding,
@@ -168,13 +188,13 @@ from shikumi import (
 Tag = InformationType("tag", str)
 
 class Tags:
-    def __init__(self, information_type: InformationType) -> None:
+    def __init__(self, information_type: InformationType[str]) -> None:
         self.information_type = information_type
 
-    def __imatmul__(self, value: str):
+    def __imatmul__(self, value: str) -> ClassBinding[str]:
         return class_binding(value, self._connect)
 
-    def _connect(self, subject: type, value: str) -> None:
+    def _connect(self, subject: type[object], value: str) -> None:
         record_descriptor_use(subject, self)
         attach_information(subject, self.information_type, value)
 
@@ -191,7 +211,7 @@ assert tuple(record.value for record in information_of(Page)) == (
 assert len(descriptor_uses_of(Page)) == 2
 ```
 
-`class_binding()` only provides the timing for post-class-creation processing. It does not require Descriptor Use recording or Information Attachment. When using it to implement a Shikumi Descriptor, call `record_descriptor_use()` and `attach_information()` from `connect` as needed.
+`class_binding()` only provides the connection timing during class creation. It does not require Descriptor Use recording or Information Attachment. When using it to implement a Shikumi Descriptor, call `record_descriptor_use()` and `attach_information()` from `connect` as needed.
 
 The internal implementation technique used by `class_binding()` is not part of the public contract.
 
@@ -205,4 +225,4 @@ kind: Operation
 
 input: value: T, connect: Callable[[type[object], T], None]
 
-output: object
+output: ClassBinding[T]

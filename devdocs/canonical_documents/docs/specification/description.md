@@ -66,8 +66,10 @@ related: [CORE_007](core.md#core_007)
 
 ## DESC_006
 
-class body の @= 記述で接続先 class がまだ成立していない場合、class_binding は class 成立後まで値を保持し、指定 callback へ owner class と値を渡す低水準機構として振る舞う。
+class body の @= 記述で接続先 class がまだ成立していない場合、class_binding は class body の実行完了まで値を保持し、owner class が利用可能になった class 作成処理中に指定 callback へ owner class と値を渡す低水準機構として振る舞う。callback は __init_subclass__ より前に実行されなければならない。
 
 title: Class binding defers connection until class creation
 
 level: MUST
+
+detail: 同じ binding name への繰り返し @= は記述順に保持し、公開型契約では最初の value と同じ型の追加値を受理できる ClassBinding[T] として表現する。通常の authoring flow では外側の writer は消費されず、各 class body 側に一時 binding が置かれる。callback から送出された例外は Shikumi が独自に正規化せず、外部から見える例外形状は利用する Python runtime の class-creation semantics に従う。具体的な一時 binding 実装、その aliasing、複数 class 間での binding object 自体の直接再利用は公開契約に含めない。

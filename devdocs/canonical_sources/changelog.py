@@ -15,6 +15,22 @@ class CHANGELOG:
     class UNRELEASED:
         """次の公開リリースへ向けた変更。"""
 
+    class V0_2_4:
+        """独自 `@=` 記述器の公開型契約を runtime 能力と一致させた型互換性修正リリース。"""
+
+        version @= "0.2.4"
+        released_on @= "2026-10-03"
+
+        class TYPING:
+            """`class_binding()` の value type を反復 `@=` まで保持し、利用者側の独自記述器を静的型検査できるようにした。runtime の binding 動作は変更していない。"""
+
+            added @= "`class_binding()` が返す一時値の公開静的契約として `ClassBinding[T]` を追加した。具体的な runtime binding 実装は引き続き非公開とする。"
+            changed @= "`class_binding()` の戻り値型を `object` から `ClassBinding[T]` へ修正し、同じ binding name への繰り返し `@=` で最初の value type を保持するようにした。"
+            changed @= "`tests/typing` の consumer typing contract に `class_binding()` を使う独自 `@=` 記述器を追加し、正しい反復記述を受理し異なる value type を拒否することを CI / release checks で固定した。"
+            changed @= "Descriptor Authoring Guide と Descriptor API Reference を新しい公開型契約へ合わせ、`ClassBinding[T]` と型付きの独自 `@=` 記述器例を記載した。"
+            changed @= "`class_binding()` の callback 契約を class body 実行後かつ `__init_subclass__()` より前という観測可能な順序として明確化し、現在の `__set_name__()` 利用は内部実装として説明した。callback 例外を Shikumi が正規化せず Python runtime の class-creation semantics に従うことも文書化した。"
+            changed @= "`@=` は Shikumi Core が強制する syntax ではなく `shikumi.standard` が提供する標準的な選択肢であること、通常の authoring flow では外側の writer を消費せず各 class body 側へ一時 binding を置くこと、低水準 `ClassBinding[T]` と Standard writer の `Self` 契約が異なる抽象度を表すことを文書化した。"
+
     class V0_2_3:
         """静的解析と CI 品質ゲートを整備した内部品質改善リリース。"""
 

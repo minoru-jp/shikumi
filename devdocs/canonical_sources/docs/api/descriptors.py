@@ -206,25 +206,47 @@ class API_REFERENCE_PART:
 
         title @= "`@=` 用のクラス接続"
 
+        class TITLE_20A:
+            r"""
+            ```python
+            class ClassBinding(Protocol[T_contra]):
+                def __imatmul__(self, value: T_contra) -> Self: ...
+            ```
+
+            `class_binding()` が返す一時値の公開静的型契約。最初に渡した値と同じ型の値を、同じ class-body name へ続けて `@=` できることを表す。
+
+            `ClassBinding[T]` は型検査向けの契約であり、具体的な runtime binding class やその内部状態は公開 API に含めない。独自{{TERM_15}}は通常この型を直接生成せず、`class_binding()` の戻り値として利用する。
+            """
+
+            title @= "`ClassBinding[T]`"
+            related @= DESCRIPTION_SPEC.DESC_006
+
+            name @= "ClassBinding"
+            kind @= TYPE
+
+            merge @= TERMS.TERM_15
+
         class TITLE_21:
             r"""
             ```python
             def class_binding(
                 value: T,
-                connect: Callable[[type, T], None],
-            ) -> object
+                connect: Callable[[type[object], T], None],
+            ) -> ClassBinding[T]
             ```
 
-            クラス本体の実行中にはまだ存在しないクラス{{TERM_11}}に対して、クラス成立後に処理を適用するための低水準 API。
+            クラス本体の実行中にはまだ存在しないクラス{{TERM_11}}に対して、class body の実行完了後、かつ `__init_subclass__()` より前の class 作成処理中に処理を適用するための低水準 API。現在の実装はこのタイミングを `__set_name__()` で実現する。
 
-            `@=` を用いる独自{{TERM_15}}の著者が利用する。{{TERM_1}} は `value` の型や意味を{{TERM_18}}せず、クラス成立後に `connect(subject, value)` を呼び出すことだけを保証する。
+            `@=` を用いる独自{{TERM_15}}の著者が利用できるが、Shikumi Core が `@=` syntax を要求するわけではない。{{TERM_1}} は `value` の型や意味を{{TERM_18}}せず、上記のタイミングで `connect(subject, value)` を呼び出すことだけを保証する。`connect` は `__init_subclass__()` で付与される状態へ依存してはならない。`connect` が送出した例外を Shikumi は独自に正規化しないため、外部から見える例外形状は Python runtime の class-creation semantics に従う。Python 3.11 と 3.12 以降では `__set_name__()` 中の例外の見え方が異なるため、特定の wrapper exception を前提にしない。
 
             返されたオブジェクトは、同じ名前に対する連続した `@=` を受け取れる。
+
+            通常の authoring flow では、module など外側の名前空間に保持された writer 自体は消費されず、各 class body 側の同名 name に一時 binding が置かれる。binding object 自体の aliasing や複数 class 間での直接再利用は公開契約に含めない。
 
             ```python
             {{class_binding_example}}
             ```
-            `class_binding()` はクラス成立後の処理タイミングを提供するだけであり、{{TERM_16}}の記録や{{TERM_14}}そのものを強制しない。{{TERM_1}} の{{TERM_15}}として利用する場合、必要に応じて `connect` から `record_descriptor_use()` と `attach_information()` をそれぞれ呼び出す。
+            `class_binding()` は class 作成中の接続タイミングを提供するだけであり、{{TERM_16}}の記録や{{TERM_14}}そのものを強制しない。{{TERM_1}} の{{TERM_15}}として利用する場合、必要に応じて `connect` から `record_descriptor_use()` と `attach_information()` をそれぞれ呼び出す。
 
             `class_binding()` の内部実装方法は公開契約に含めない。
 
@@ -234,6 +256,7 @@ class API_REFERENCE_PART:
             title @= "`class_binding()`"
             class_binding_example @= r"""
             from shikumi import (
+                ClassBinding,
                 InformationType,
                 attach_information,
                 class_binding,
@@ -245,13 +268,13 @@ class API_REFERENCE_PART:
             Tag = InformationType("tag", str)
 
             class Tags:
-                def __init__(self, information_type: InformationType) -> None:
+                def __init__(self, information_type: InformationType[str]) -> None:
                     self.information_type = information_type
 
-                def __imatmul__(self, value: str):
+                def __imatmul__(self, value: str) -> ClassBinding[str]:
                     return class_binding(value, self._connect)
 
-                def _connect(self, subject: type, value: str) -> None:
+                def _connect(self, subject: type[object], value: str) -> None:
                     record_descriptor_use(subject, self)
                     attach_information(subject, self.information_type, value)
 
@@ -274,7 +297,7 @@ class API_REFERENCE_PART:
             kind @= OPERATION
             input @= "value: T"
             input @= "connect: Callable[[type[object], T], None]"
-            output @= "object"
+            output @= "ClassBinding[T]"
 
             merge @= TERMS.TERM_11
             merge @= TERMS.TERM_15

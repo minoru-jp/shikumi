@@ -52,7 +52,7 @@ ShikumiはPythonの実行後に成立した対象を解釈し、意味像を構�
 pip install shikumi
 ```
 
-現在のバージョンは `0.2.3` です。Python `>=3.11` を対象としています。0.2.0 から開発段階は Beta です。
+現在のバージョンは `0.2.4` です。Python `>=3.11` を対象としています。0.2.0 から開発段階は Beta です。
 
 ## 最小例
 
@@ -116,6 +116,14 @@ ShikumiはsourceをASTとして意味解析する静的解析器ではありま�
 したがって、**Shikumiへ渡すmoduleやpackageは信頼できるPythonコードだけにしてください。** 検証目的であってもimport時のコードは通常の権限で実行されます。
 
 実行時確定、構造、検証、実現の厳密な契約は [`Specification`](https://github.com/minoru-jp/shikumi/blob/main/docs/specification/INDEX.md) にまとめています。
+
+## 標準の `@=` 記法
+
+最小例の `title @= "Overview"` は Shikumi Core が強制する構文ではありません。Shikumi は記述器の具体的な Python syntax を規定せず、`shikumi.standard` が再利用可能な標準記述器として `assignment()` などを提供します。
+
+この `@=` スタイルでは、module など外側の名前空間で保持された記述器そのものが消費・変質するわけではありません。class body 側の同名 name に一時的な class binding が置かれ、class 作成処理中の接続に使われます。そのため、同じ記述器を別の class body でも起点として利用できます。
+
+独自の記述器 syntax を実装する場合は [`Descriptor Authoring`](https://github.com/minoru-jp/shikumi/blob/main/docs/guides/descriptor-authoring.md) を参照してください。
 
 ## 公式作例
 

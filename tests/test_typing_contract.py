@@ -2,7 +2,14 @@ from __future__ import annotations
 
 from typing import get_args, get_type_hints
 
-from shikumi import Information, InformationType, ViewItem, attach_information
+from shikumi import (
+    ClassBinding,
+    Information,
+    InformationType,
+    ViewItem,
+    attach_information,
+    class_binding,
+)
 
 
 def test_information_type_and_information_are_generic() -> None:
@@ -14,6 +21,15 @@ def test_information_type_and_information_are_generic() -> None:
     constructor_type_variable = get_args(value_type_options[0])[0]
 
     assert constructor_type_variable is InformationType.__parameters__[0]
+
+
+def test_class_binding_preserves_value_type_variable() -> None:
+    assert len(ClassBinding.__parameters__) == 1
+
+    hints = get_type_hints(class_binding)
+    return_type_variable = get_args(hints["return"])[0]
+
+    assert return_type_variable is hints["value"]
 
 
 def test_attach_information_preserves_information_value_type_variable() -> None:

@@ -24,9 +24,10 @@ class _AssignmentWriter(Generic[T]):
         self.information_type = information_type
 
     def __imatmul__(self, value: T) -> Self:
-        # At runtime ``@=`` replaces the class-body name with a temporary
-        # _ClassBinding.  Statically, however, the name must remain the same
-        # writer type so repeated ``@=`` operations keep checking ``T``.
+        # Standard intentionally preserves the high-level writer type across
+        # augmented assignment. ``ClassBinding[T]`` is the low-level contract
+        # returned by class_binding(); the temporary binding is an implementation
+        # detail of this higher-level descriptor style.
         return cast(Self, class_binding(value, self._connect))
 
     def _connect(self, subject: type[object], value: T) -> None:

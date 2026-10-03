@@ -1,6 +1,6 @@
 """Public surface for the Shikumi core."""
 
-from .binding import class_binding
+from .binding import ClassBinding, class_binding
 from .description import (
     DescriptorUse,
     DescriptorUseRule,
@@ -49,6 +49,7 @@ from .view import SemanticView, ViewItem
 
 __all__ = [
     "Cardinality",
+    "ClassBinding",
     "DescriptorUse",
     "DescriptorUseRule",
     "Diagnostic",

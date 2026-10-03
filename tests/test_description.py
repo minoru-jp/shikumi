@@ -1,6 +1,11 @@
 from __future__ import annotations
 
+import sys
+
+import pytest
+
 from shikumi import (
+    ClassBinding,
     InformationType,
     Shikumi,
     attach_information,
@@ -19,35 +24,58 @@ def _defined_class(source: str, **names: object) -> type[object]:
     return namespace["Page"]  # type: ignore[return-value]
 
 
-def test_class_binding_connects_after_class_creation() -> None:
+def test_class_binding_connects_before_init_subclass_without_consuming_writer() -> None:
     title_type = InformationType("title", str)
-    observed: list[tuple[type[object], object]] = []
+    observed: list[tuple[str, type[object], object | None]] = []
+
+    class Base:
+        def __init_subclass__(cls) -> None:
+            observed.append(("init_subclass", cls, None))
+            super().__init_subclass__()
 
     class TitleDescriptions:
-        def __imatmul__(self, value: object) -> object:
+        def __imatmul__(self, value: object) -> ClassBinding[object]:
             return class_binding(value, self._connect)
 
         def _connect(self, subject: type[object], value: object) -> None:
-            observed.append((subject, value))
+            observed.append(("connect", subject, value))
             record_descriptor_use(subject, self)
             attach_information(subject, title_type, value)
 
     title = TitleDescriptions()
-    Page = _defined_class(
-        'class Page:\n    title @= "Overview"\n',
+    FirstPage = _defined_class(
+        'class Page(Base):\n    title @= "Overview"\n',
+        Base=Base,
+        title=title,
+    )
+    SecondPage = _defined_class(
+        'class Page(Base):\n    title @= "Details"\n',
+        Base=Base,
         title=title,
     )
 
     try:
-        assert observed == [(Page, "Overview")]
-        assert "title" not in Page.__dict__
-        record = information_of(Page)[0]
-        assert record.type is title_type
-        assert record.value == "Overview"
-        assert descriptor_uses_of(Page)[0].descriptor is title
+        assert observed == [
+            ("connect", FirstPage, "Overview"),
+            ("init_subclass", FirstPage, None),
+            ("connect", SecondPage, "Details"),
+            ("init_subclass", SecondPage, None),
+        ]
+        assert "title" not in FirstPage.__dict__
+        assert "title" not in SecondPage.__dict__
+        first_record = information_of(FirstPage)[0]
+        second_record = information_of(SecondPage)[0]
+        assert first_record.type is title_type
+        assert first_record.value == "Overview"
+        assert second_record.type is title_type
+        assert second_record.value == "Details"
+        assert descriptor_uses_of(FirstPage)[0].descriptor is title
+        assert descriptor_uses_of(SecondPage)[0].descriptor is title
     finally:
-        clear_information(Page)
-        clear_descriptor_uses(Page)
+        clear_information(FirstPage)
+        clear_information(SecondPage)
+        clear_descriptor_uses(FirstPage)
+        clear_descriptor_uses(SecondPage)
 
 
 def test_class_binding_supports_repeated_at_equals_without_interpreting_values() -> (
@@ -56,7 +84,7 @@ def test_class_binding_supports_repeated_at_equals_without_interpreting_values()
     payloads: list[object] = []
 
     class PayloadDescriptions:
-        def __imatmul__(self, value: object) -> object:
+        def __imatmul__(self, value: object) -> ClassBinding[object]:
             return class_binding(value, self._connect)
 
         @staticmethod
@@ -82,7 +110,7 @@ def test_custom_at_equals_writer_can_choose_information_connection() -> None:
     right_type = InformationType("right", str)
 
     class PairDescriptions:
-        def __imatmul__(self, value: tuple[str, str]) -> object:
+        def __imatmul__(self, value: tuple[str, str]) -> ClassBinding[tuple[str, str]]:
             return class_binding(value, self._connect)
 
         @staticmethod
@@ -103,6 +131,31 @@ def test_custom_at_equals_writer_can_choose_information_connection() -> None:
         assert view.focused.values(right_type) == ("R",)
     finally:
         clear_information(Page)
+
+
+def test_class_binding_connect_exception_follows_python_class_creation_semantics() -> (
+    None
+):
+    def fail(subject: type[object], value: str) -> None:
+        raise ValueError(value)
+
+    def define_page() -> type[object]:
+        return _defined_class(
+            'class Page:\n    field = class_binding("boom", fail)\n',
+            class_binding=class_binding,
+            fail=fail,
+        )
+
+    if sys.version_info < (3, 12):
+        with pytest.raises(RuntimeError) as caught:
+            define_page()
+        assert isinstance(caught.value.__cause__, ValueError)
+        assert str(caught.value.__cause__) == "boom"
+    else:
+        with pytest.raises(ValueError, match="boom") as caught:
+            define_page()
+        notes = getattr(caught.value, "__notes__", ())
+        assert any("Error calling __set_name__" in note for note in notes)
 
 
 def test_class_binding_requires_callable_connector() -> None:

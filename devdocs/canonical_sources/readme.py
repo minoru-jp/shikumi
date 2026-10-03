@@ -144,6 +144,19 @@ class README:
         merge @= TERMS.TERM_16
         merge @= TERMS.TERM_18
 
+    class STANDARD_AUTHORING_STYLE:
+        """
+        最小例の `title @= "Overview"` は Shikumi Core が強制する構文ではありません。Shikumi は{{TERM_15}}の具体的な Python syntax を規定せず、`shikumi.standard` が再利用可能な標準記述器として `assignment()` などを提供します。
+
+        この `@=` スタイルでは、module など外側の名前空間で保持された記述器そのものが消費・変質するわけではありません。class body 側の同名 name に一時的な class binding が置かれ、class 作成処理中の接続に使われます。そのため、同じ記述器を別の class body でも起点として利用できます。
+
+        独自の記述器 syntax を実装する場合は [`Descriptor Authoring`](https://github.com/minoru-jp/shikumi/blob/main/docs/guides/descriptor-authoring.md) を参照してください。
+        """
+
+        title @= "標準の `@=` 記法"
+
+        merge @= TERMS.TERM_15
+
     class EXAMPLES:
         """
         [`structure_showcase`](https://github.com/minoru-jp/shikumi/blob/main/examples/structure_showcase/README.md) は、特定用途の完成例ではなく、{{TERM_8}}で表現できる一般的な構造パターンを valid / invalid fixture としてまとめた実行可能なショーケースです。

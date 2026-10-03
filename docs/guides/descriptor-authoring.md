@@ -80,11 +80,14 @@ assert information_of(UserService)[0].value is UserRepository
 
 ## Custom `@=` Descriptors
 
-When `@=` is evaluated, the target class does not yet exist. `class_binding()` defers the connection until class creation and replays repeated `@=` writes under the same binding name in source order.
+When `@=` is evaluated, the target class does not yet exist. `class_binding()` runs its callback during class creation, after the class body has finished executing and before `__init_subclass__()`. The current implementation realizes this timing through `__set_name__()`, so the callback must not depend on state added by `__init_subclass__()`. Repeated `@=` writes under the same binding name are replayed in source order. Shikumi does not normalize callback exceptions: Python 3.11 wraps an exception raised from `__set_name__()` in `RuntimeError`, while Python 3.12 and later propagate the original exception with a runtime note.
+
+`@=` is one possible syntax for a custom Descriptor; Shikumi Core does not require it. In the normal authoring flow, the writer held in the outer namespace is not consumed. Each class body receives its own temporary binding under that name. Aliasing or directly reusing the binding object itself outside this authoring pattern is not part of the public contract.
 
 ```python
 from shikumi import (
     Cardinality,
+    ClassBinding,
     InformationType,
     attach_information,
     class_binding,
@@ -95,10 +98,10 @@ from shikumi import (
 Tag = InformationType("tag", str, cardinality=Cardinality.MANY)
 
 class TagDescriptions:
-    def __imatmul__(self, value: str):
+    def __imatmul__(self, value: str) -> ClassBinding[str]:
         return class_binding(value, self._connect)
 
-    def _connect(self, subject: type, value: str) -> None:
+    def _connect(self, subject: type[object], value: str) -> None:
         record_descriptor_use(subject, self)
         attach_information(subject, Tag, value)
 

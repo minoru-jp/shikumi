@@ -44,8 +44,10 @@ level: MUST NOT
 related: [CORE_007](core.md#core_007)
 
 ## DESC_006
-For `@=` descriptions whose target class does not yet exist, `class_binding()` **MUST** defer the supplied value until class creation and then invoke the callback with the owner class and value.
+For `@=` descriptions whose target class does not yet exist, `class_binding()` **MUST** retain the supplied value until the class body has finished executing and invoke the callback during class creation, once the owner class is available and before `__init_subclass__()`, with the owner class and value.
 
 title: Class binding defers connection until class creation
 
 level: MUST
+
+detail: Repeated `@=` writes under the same binding name are preserved in source order. The public typing contract represents the returned value as `ClassBinding[T]`, which accepts additional values of the same type as the initial value. In the normal authoring flow, the outer writer is not consumed; a temporary binding is placed in each class-body namespace. Shikumi does not normalize exceptions raised by the callback; their externally visible form follows the class-creation semantics of the Python runtime in use. The concrete temporary binding implementation, aliasing of that binding, and direct reuse of the binding object across multiple classes are not part of the public contract.

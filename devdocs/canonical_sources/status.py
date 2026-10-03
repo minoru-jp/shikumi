@@ -34,6 +34,19 @@ class STATUS:
 
         title @= "安定性方針"
 
+    class TYPING_CONTRACT:
+        """
+        Shikumi は `py.typed` を配布し、本体 source の basedpyright clean だけでなく、`tests/typing` を利用者側の型契約として検証します。0.2.4 では標準記述器に加えて、`class_binding()` を使う独自 `@=` 記述器の反復記述も consumer typing contract に含めます。
+
+        `class_binding()` は `ClassBinding[T]` を返し、最初の値型 `T` を同じ binding name への後続 `@=` まで保持します。`ClassBinding[T]` は公開された静的契約ですが、実際に class body 中で用いる一時 binding の具体実装は内部詳細として扱います。
+
+        低水準の `class_binding()` は runtime の一時 binding を `ClassBinding[T]` として表現します。一方、`shikumi.standard.assignment()` は高水準の標準記述器として一時 binding を実装詳細に隠し、augmented assignment の前後で writer 自身の静的型を維持します。この違いは抽象度の違いによる意図的な型契約であり、`@=` 自体を Shikumi Core が必須 syntax として要求するものではありません。
+
+        `class_binding()` の公開 lifecycle 契約は class body 実行後かつ `__init_subclass__()` より前に callback を適用することです。現在の実装は `__set_name__()` を利用しますが、この具体的な hook 自体は公開契約ではありません。また callback 例外は Shikumi が独自に正規化せず Python runtime の class-creation semantics に従うため、Python 3.11 と 3.12 以降では外部から見える例外形状が異なります。
+        """
+
+        title @= "型情報の公開契約"
+
     class BETA_GOALS:
         """
         Beta 期間では、特に次の点を確認します。

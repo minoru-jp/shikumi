@@ -6,6 +6,21 @@ Records the major changes in each public release of Shikumi.
 
 Changes planned for the next public release.
 
+## 0.2.4 - 2026-10-03
+
+Typing-compatibility release aligning the public contract for custom `@=` Descriptors with the runtime capability already provided by `class_binding()`.
+
+### Typing
+
+The value type accepted by `class_binding()` now remains visible to static type checkers across repeated `@=` writes. Runtime class-binding behavior is unchanged.
+
+- Added `ClassBinding[T]` as the public static contract for the temporary value returned by `class_binding()`. The concrete runtime binding implementation remains private.
+- Changed the return type of `class_binding()` from `object` to `ClassBinding[T]`, preserving the initial value type across repeated `@=` writes under the same binding name.
+- Added a custom `@=` writer to the `tests/typing` consumer typing contract, so CI and release checks verify that valid repeated writes are accepted and values of a different type are rejected.
+- Updated the Descriptor Authoring Guide and Descriptor API Reference to document `ClassBinding[T]` and show a typed custom `@=` Descriptor.
+- Clarified the public `class_binding()` callback contract as the observable ordering after class-body execution and before `__init_subclass__()`, while documenting the current use of `__set_name__()` as an implementation detail. Also documented that callback exceptions are not normalized by Shikumi and therefore follow Python runtime class-creation semantics.
+- Documented that `@=` is an optional authoring style provided by `shikumi.standard`, that the outer writer is not consumed by normal class-body use, and that low-level `ClassBinding[T]` and the Standard writer's `Self` contract intentionally represent different abstraction levels.
+
 ## 0.2.3 - 2026-10-03
 
 Internal quality-improvement release establishing static-analysis and CI quality gates.

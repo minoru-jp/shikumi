@@ -6,7 +6,7 @@ Shikumi enters **Beta** with version 0.2.0. Beta does not mean that the public A
 
 ## Current status
 
-The current public release is `0.2.3`, in the `0.2.x` release series, with development status **Beta**.
+The current public release is `0.2.4`, in the `0.2.x` release series, with development status **Beta**.
 
 Version 0.2.0 establishes the foundation to be exercised in real projects, including the reorganized documentation system and the expanded Structure regulation API. The Beta period is not intended for redesigning the API from scratch. It is a period for validating the current design through dependent projects and real use while making necessary improvements without unnecessary breakage.
 
@@ -17,6 +17,16 @@ From 0.2.0 onward, breaking changes to the public API will not be made without a
 Significant reasons include defects where preserving the existing behavior would compromise correctness, safety, or the integrity of the core design. Normal feature development and improvements should be additive. When an existing public API must eventually be replaced, Shikumi will use deprecation and a migration period whenever practical.
 
 Internal implementation details, documentation-generation infrastructure, and private development structures are outside this compatibility policy, but preserving published semantic contracts remains the priority.
+
+## Public typing contract
+
+Shikumi distributes `py.typed` and verifies both a clean basedpyright result for the package source and a consumer-side typing contract under `tests/typing`. In 0.2.4, that consumer contract covers repeated custom `@=` descriptions built with `class_binding()` in addition to the standard Descriptors.
+
+`class_binding()` returns `ClassBinding[T]`, preserving the first value type `T` across later `@=` writes under the same binding name. `ClassBinding[T]` is a public static typing contract; the concrete temporary binding implementation used inside a class body remains an internal detail.
+
+The low-level `class_binding()` API exposes its temporary runtime binding as `ClassBinding[T]`. By contrast, `shikumi.standard.assignment()` is a higher-level standard Descriptor and intentionally keeps the writer's own static type visible across augmented assignment, treating the temporary binding as an implementation detail. These contracts differ by abstraction level; `@=` itself is not a syntax required by Shikumi Core.
+
+The public lifecycle contract of `class_binding()` is that the callback is applied after class-body execution and before `__init_subclass__()`. The current implementation uses `__set_name__()` to realize that timing, but that specific hook is not itself part of the public contract. Shikumi also does not normalize callback exceptions, so the externally visible exception shape follows Python's class-creation semantics and differs between Python 3.11 and Python 3.12 or later.
 
 ## Beta goals
 

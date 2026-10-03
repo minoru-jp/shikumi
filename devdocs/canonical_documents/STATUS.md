@@ -22,7 +22,7 @@ Shikumi の現在の開発段階、互換性方針、および 1.0 へ向けた�
 
 ## 現在のステータス
 
-現在の公開バージョンは `0.2.3`、公開バージョン系列は `0.2.x`、開発段階は **Beta** です。
+現在の公開バージョンは `0.2.4`、公開バージョン系列は `0.2.x`、開発段階は **Beta** です。
 
 0.2.0 では文書体系の再構成と構造規定 API の拡張を行い、今後の実運用で検証する基盤を確定しました。Beta 期間は API を作り直すための期間ではなく、現在の設計を依存プロジェクトと実利用の中で検証し、必要な改善を互換性を維持しながら行う期間です。
 
@@ -33,6 +33,16 @@ Shikumi の現在の開発段階、互換性方針、および 1.0 へ向けた�
 重大な理由には、維持することで正確性・安全性・中核的な設計整合性を損なう欠陥などが含まれます。通常の機能追加や改善は additive に行い、既存 API を置き換える必要が生じた場合は、可能な限り deprecation と移行期間を設けます。
 
 内部実装、文書生成基盤、非公開の開発用構造はこの互換性方針の対象外ですが、公開された意味上の契約を変えないことを優先します。
+
+## 型情報の公開契約
+
+Shikumi は `py.typed` を配布し、本体 source の basedpyright clean だけでなく、`tests/typing` を利用者側の型契約として検証します。0.2.4 では標準記述器に加えて、`class_binding()` を使う独自 `@=` 記述器の反復記述も consumer typing contract に含めます。
+
+`class_binding()` は `ClassBinding[T]` を返し、最初の値型 `T` を同じ binding name への後続 `@=` まで保持します。`ClassBinding[T]` は公開された静的契約ですが、実際に class body 中で用いる一時 binding の具体実装は内部詳細として扱います。
+
+低水準の `class_binding()` は runtime の一時 binding を `ClassBinding[T]` として表現します。一方、`shikumi.standard.assignment()` は高水準の標準記述器として一時 binding を実装詳細に隠し、augmented assignment の前後で writer 自身の静的型を維持します。この違いは抽象度の違いによる意図的な型契約であり、`@=` 自体を Shikumi Core が必須 syntax として要求するものではありません。
+
+`class_binding()` の公開 lifecycle 契約は class body 実行後かつ `__init_subclass__()` より前に callback を適用することです。現在の実装は `__set_name__()` を利用しますが、この具体的な hook 自体は公開契約ではありません。また callback 例外は Shikumi が独自に正規化せず Python runtime の class-creation semantics に従うため、Python 3.11 と 3.12 以降では外部から見える例外形状が異なります。
 
 ## Beta 期間の目的
 
